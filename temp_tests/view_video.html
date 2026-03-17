@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频查看器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .video-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        video {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 0 auto;
+        }
+        .info {
+            text-align: center;
+            color: #666;
+            margin-top: 10px;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎥 瑜伽动作标注视频查看器</h1>
+    
+    <div class="video-container">
+        <h2>MediaPipe 关键点检测结果</h2>
+        <video id="videoPlayer" controls>
+            <source src="data/output_test.mp4" type="video/mp4">
+            您的浏览器不支持视频播放
+        </video>
+        <div class="info">
+            <p>标注说明：</p>
+            <ul style="text-align: left; max-width: 600px; margin: 10px auto;">
+                <li><span style="color: red;">●</span> 红色点：深度较浅的关键点（离镜头近）</li>
+                <li><span style="color: blue;">●</span> 蓝色点：深度较深的关键点（离镜头远）</li>
+                <li>绿色连线：骨骼连接线</li>
+                <li>共检测 33 个关键点</li>
+            </ul>
+        </div>
+        <div class="controls">
+            <button onclick="document.getElementById('videoPlayer').play()">▶ 播放</button>
+            <button onclick="document.getElementById('videoPlayer').pause()">⏸ 暂停</button>
+            <button onclick="document.getElementById('videoPlayer').currentTime=0">↺ 重播</button>
+        </div>
+    </div>
+
+    <div class="video-container">
+        <h2>上传其他视频查看</h2>
+        <input type="file" id="videoInput" accept="video/mp4,video/avi,video/mov" style="margin-bottom: 10px;">
+        <br>
+        <button onclick="loadCustomVideo()">加载视频</button>
+        <div id="customVideoContainer" style="display: none; margin-top: 20px;">
+            <video id="customVideoPlayer" controls style="width: 100%; max-width: 800px;">
+                您的浏览器不支持视频播放
+            </video>
+        </div>
+    </div>
+
+    <script>
+        function loadCustomVideo() {
+            const input = document.getElementById('videoInput');
+            const container = document.getElementById('customVideoContainer');
+            const player = document.getElementById('customVideoPlayer');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const url = URL.createObjectURL(file);
+                
+                player.src = url;
+                container.style.display = 'block';
+                player.load();
+            } else {
+                alert('请先选择视频文件');
+            }
+        }
+    </script>
+</body>
+</html>

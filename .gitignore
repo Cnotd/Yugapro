@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+data/raw/*
+data/processed/*
+data/test_set/*
+data/temp/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/test_set/.gitkeep
+!data/temp/.gitkeep
+
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# Output files
+output/
+*.log
+model_output.txt
