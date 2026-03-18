@@ -52,27 +52,46 @@ class ResultParser:
     def _extract_json(self, text: str) -> Optional[str]:
         """
         从文本中提取JSON部分
-        
+
         Args:
             text: 原始文本
-            
+
         Returns:
             JSON字符串,未找到返回None
         """
         # 查找```json和```之间的内容
         pattern = r'```json\s*(.*?)\s*```'
         match = re.search(pattern, text, re.DOTALL)
-        
+
         if match:
             return match.group(1).strip()
-        
-        # 尝试查找单纯的{...} JSON对象
-        pattern = r'\{[\s\S]*\}'
+
+        # 查找```和```之间的内容 (不指定语言)
+        pattern = r'```\s*(\{[\s\S]*?\})\s*```'
         match = re.search(pattern, text)
-        
+
         if match:
-            return match.group(0)
-        
+            return match.group(1).strip()
+
+        # 尝试查找单纯的{...} JSON对象 - 使用嵌套括号匹配
+        brace_count = 0
+        start = -1
+        json_str = ""
+
+        for i, char in enumerate(text):
+            if char == '{':
+                if brace_count == 0:
+                    start = i
+                brace_count += 1
+            elif char == '}':
+                brace_count -= 1
+                if brace_count == 0 and start != -1:
+                    json_str = text[start:i+1]
+                    break
+
+        if json_str:
+            return json_str.strip()
+
         return None
     
     def _validate_and_clean(self, data: Dict) -> Dict:

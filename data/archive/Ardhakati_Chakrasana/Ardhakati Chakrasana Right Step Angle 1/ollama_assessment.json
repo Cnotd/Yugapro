@@ -1,0 +1,44 @@
+{
+  "pose_name": "半月式",
+  "timestamp": "2026-03-18T16:04:59.551241",
+  "angle_data": {
+    "mean": {
+      "left_elbow": 169.86239752064793,
+      "right_elbow": 154.2323670283573,
+      "left_knee": 171.80224137394168,
+      "right_knee": 168.27000845689477,
+      "left_hip": 158.51800643592276,
+      "right_hip": 164.00196620942003,
+      "left_shoulder": 58.00122242239445,
+      "right_shoulder": 78.43859400092985
+    },
+    "std": {
+      "left_elbow": 8.725855234910812,
+      "right_elbow": 13.490974913861324,
+      "left_knee": 3.145858178887961,
+      "right_knee": 2.003738990763025,
+      "left_hip": 11.130498453314653,
+      "right_hip": 1.594257752185462,
+      "left_shoulder": 32.041096593419596,
+      "right_shoulder": 44.67314930496421
+    },
+    "stability": 0.725
+  },
+  "assessment": {
+    "score": {
+      "total": 85,
+      "accuracy": 35,
+      "stability": 25,
+      "coordination": 25
+    },
+    "problems": [
+      "Problem 1",
+      "Problem 2",
+      "Problem 3"
+    ],
+    "suggestions": [
+      "建议咨询专业瑜伽教练",
+      "建议咨询专业瑜伽教练"
+    ]
+  }
+}

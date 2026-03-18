@@ -1,0 +1,75 @@
+{
+  "video_name": "video_annotated",
+  "total_frames": 3,
+  "avg_angles": {
+    "left_elbow": 169.86239752064793,
+    "right_elbow": 154.2323670283573,
+    "left_knee": 171.80224137394168,
+    "right_knee": 168.27000845689477,
+    "left_hip": 158.51800643592276,
+    "right_hip": 164.00196620942003,
+    "left_shoulder": 58.00122242239445,
+    "right_shoulder": 78.43859400092985,
+    "spine_angle": 10.649895594157934,
+    "body_tilt": 10.278211821094017
+  },
+  "std_angles": {
+    "left_elbow": 8.725855234910812,
+    "right_elbow": 13.490974913861324,
+    "left_knee": 3.145858178887961,
+    "right_knee": 2.003738990763025,
+    "left_hip": 11.130498453314653,
+    "right_hip": 1.594257752185462,
+    "left_shoulder": 32.041096593419596,
+    "right_shoulder": 44.67314930496421,
+    "spine_angle": 13.2538097540408,
+    "body_tilt": 11.743953083739504
+  },
+  "angle_sequence": [
+    {
+      "timestamp": 0.0,
+      "angles": {
+        "left_elbow": 158.13749807431316,
+        "right_elbow": 159.56087182851448,
+        "left_knee": 170.1066990224692,
+        "right_knee": 170.33487159637588,
+        "left_hip": 167.87296108380573,
+        "right_hip": 165.30645812037992,
+        "left_shoulder": 36.892264518320076,
+        "right_shoulder": 41.76262014852178,
+        "spine_angle": 1.481437358016788,
+        "body_tilt": 0.1288977871173542
+      }
+    },
+    {
+      "timestamp": 1.999466808850973,
+      "angles": {
+        "left_elbow": 179.05739493303668,
+        "right_elbow": 167.43363963174707,
+        "left_knee": 176.2121028943052,
+        "right_knee": 165.556889505139,
+        "left_hip": 142.877153200297,
+        "right_hip": 161.7571712558602,
+        "left_shoulder": 33.831693418605454,
+        "right_shoulder": 141.32644186651893,
+        "spine_angle": 29.39215210567433,
+        "body_tilt": 26.738132099395422
+      }
+    },
+    {
+      "timestamp": 3.998933617701946,
+      "angles": {
+        "left_elbow": 172.39229955459393,
+        "right_elbow": 135.70258962481034,
+        "left_knee": 169.08792220505066,
+        "right_knee": 168.9182642691695,
+        "left_hip": 164.80390502366558,
+        "right_hip": 164.94226925202003,
+        "left_shoulder": 103.2797093302578,
+        "right_shoulder": 52.22671998774881,
+        "spine_angle": 1.0760973187826859,
+        "body_tilt": 3.9676055767692766
+      }
+    }
+  ]
+}

@@ -96,6 +96,8 @@ yoga_assessment_system/
 │   ├── prompt_builder.py   # 提示词构建模块
 │   ├── ollama_client.py    # Ollama客户端
 │   ├── result_parser.py    # 结果解析模块
+│   ├── frame_sampler.py    # 帧采样模块
+│   ├── archive_manager.py  # 归档管理模块
 │   └── app.py             # Gradio主界面
 ├── config/                 # 配置文件
 │   └── settings.py        # 动作标准库
@@ -103,13 +105,60 @@ yoga_assessment_system/
 │   ├── video_utils.py     # 视频处理工具
 │   └── visualization.py   # 可视化工具
 ├── data/                  # 数据目录
-│   ├── raw/              # 原始视频
-│   ├── processed/        # 处理结果
-│   └── test_set/         # 测试集
+│   ├── raw/              # 原始视频（待处理）
+│   ├── temp/             # 临时输出（处理中间文件）
+│   └── archive/          # 最终归档（长期保存）
+│       └── index.json    # 归档索引
+├── temp_tests/           # 测试脚本
+│   ├── test_ardhakati.py          # 单视频测试
+│   └── test_mediapipe_batch.py   # 批量处理
 ├── requirements.txt       # 依赖列表
 ├── README.md              # 项目说明
-└── run.py                 # 启动脚本
+├── ARCHIVE_GUIDE.md      # 归档系统指南
+├── ENV_SETUP.md          # 环境配置说明
+├── archive_results.py    # 手动归档脚本
+├── view_archive.py       # 查看归档脚本
+└── run.py                # 启动脚本
 ```
+
+## 归档系统
+
+本系统包含完整的归档管理功能，用于组织和管理标注结果。
+
+### 归档目录结构
+
+```
+data/archive/
+├── index.json           # 归档索引
+└── {动作名}/
+    └── {视频名}/
+        ├── video_annotated.mp4  # 标注视频
+        ├── best_frames/         # 最佳帧（5张）
+        ├── analysis.png         # 分析图表
+        └── metadata.json       # 元数据
+```
+
+### 使用归档功能
+
+**自动归档**（推荐）：
+```bash
+# 处理视频并自动归档
+python temp_tests/test_ardhakati.py
+
+# 批量处理并自动归档
+python temp_tests/test_mediapipe_batch.py
+```
+
+**手动归档**：
+```bash
+# 归档 temp/ 下所有标注结果
+python archive_results.py
+
+# 查看归档内容
+python view_archive.py
+```
+
+详细说明请查看 [ARCHIVE_GUIDE.md](ARCHIVE_GUIDE.md)
 
 ## 系统架构
 

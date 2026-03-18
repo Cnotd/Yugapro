@@ -20,28 +20,28 @@ def test_ollama_client():
     is_connected = client.check_connection()
     
     if is_connected:
-        print("✓ Ollama服务连接成功")
-        
+        print("[OK] Ollama服务连接成功")
+
         # 列出可用模型
         print("\n获取可用模型列表...")
         models = client.list_models()
-        
+
         if models:
-            print(f"✓ 找到 {len(models)} 个模型:")
+            print(f"[OK] 找到 {len(models)} 个模型:")
             for model in models:
                 print(f"  - {model.get('name', 'Unknown')}")
         else:
-            print("⚠ 未找到可用模型")
-        
+            print("[WARN] 未找到可用模型")
+
         # 测试文本生成
         print("\n测试文本生成...")
         try:
             response = client.generate("Hello, say hi")
-            print(f"✓ 文本生成成功: {response[:50]}...")
+            print(f"[OK] 文本生成成功: {response[:50]}...")
         except Exception as e:
-            print(f"⚠ 文本生成测试失败: {e}")
+            print(f"[WARN] 文本生成测试失败: {e}")
     else:
-        print("✗ 无法连接到Ollama服务")
+        print("[FAIL] 无法连接到Ollama服务")
         print("  请确保:")
         print("  1. Ollama已安装并运行")
         print("  2. 访问地址: http://localhost:11434")
