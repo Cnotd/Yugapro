@@ -96,9 +96,17 @@ class OllamaClient:
             import numpy as np
             image = Image.fromarray(np.uint8(image))
         
+        # 调整图像大小以加快推理速度（最大边长252像素）
+        original_size = image.size
+        max_dimension = max(original_size)
+        if max_dimension > 252:
+            scale = 252 / max_dimension
+            new_size = (int(original_size[0] * scale), int(original_size[1] * scale))
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+        
         # 转换为base64
         buffered = io.BytesIO()
-        image.save(buffered, format="JPEG")
+        image.save(buffered, format="JPEG", quality=85)
         img_str = base64.b64encode(buffered.getvalue()).decode()
         
         return img_str

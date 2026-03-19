@@ -141,8 +141,8 @@ VIDEO_CONFIG = {
 # Ollama配置
 OLLAMA_CONFIG = {
     "host": "http://localhost:11434",
-    "model": "qwen:4b",
-    "timeout": 30,
+    "model": "qwen3.5:4b",
+    "timeout": 120,
     "temperature": 0.7,
 }
 
