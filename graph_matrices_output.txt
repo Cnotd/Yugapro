@@ -1,0 +1,16 @@
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+
+视频: video_annotated.mp4
+总帧数: 180
+
+处理第1帧...
+姿态检测成功！
+
+Traceback (most recent call last):
+  File "d:\yuga_test\output_graph_matrices.py", line 169, in <module>
+    main()
+  File "d:\yuga_test\output_graph_matrices.py", line 157, in main
+    graph = PoseGraph(landmarks)
+  File "d:\yuga_test\src\pose_graph.py", line 131, in __init__
+    for idx, lm in enumerate(landmarks.landmark):
+AttributeError: 'list' object has no attribute 'landmark'
