@@ -14,10 +14,31 @@ class PromptBuilder:
         self.role = "You are a professional yoga instructor with 10+ years of experience specializing in yoga pose assessment and guidance."
         self.task = "Assess the user's yoga pose based on provided data."
 
+    def build_with_graph(self, pose_graph, pose_name: str, pose_standards: Optional[Dict] = None) -> str:
+        """
+        使用姿态图信息构建评估提示词
+
+        Args:
+            pose_graph: PoseGraph对象，包含完整的关节图信息
+            pose_name: 动作名称
+            pose_standards: 动作标准库
+
+        Returns:
+            prompt: 结构化提示词
+        """
+        prompt_parts = [
+            self._build_role_section(),
+            self._build_pose_info_section(pose_name, pose_standards),
+            self._build_graph_data_section(pose_graph),
+            self._build_instruction_section()
+        ]
+
+        return "\n\n".join(prompt_parts)
+
     def build(self, stats: Dict, stability_score: float,
              pose_name: str, pose_standards: Optional[Dict] = None) -> str:
         """
-        构建评估提示词
+        构建评估提示词（传统方法，使用角度统计）
 
         Args:
             stats: 统计特征
@@ -87,6 +108,23 @@ Your task: {self.task}"""
             for angle_name in stats["mean"].keys():
                 if angle_name in stats["min"] and angle_name in stats["max"]:
                     section += f"\n  - {angle_name}: {stats['min'][angle_name]:.2f}° - {stats['max'][angle_name]:.2f}°"
+
+        return section
+
+    def _build_graph_data_section(self, pose_graph) -> str:
+        """构建姿态图数据部分"""
+        descriptor = pose_graph.get_graph_descriptor()
+        text_desc = pose_graph.to_text_description()
+
+        section = "# Pose Graph Information"
+        section += "\n\n" + text_desc
+        section += "\n\nGraph Statistics:"
+        section += f"\n- Number of joints: {descriptor['graph_stats']['num_nodes']}"
+        section += f"\n- Number of connections: {descriptor['graph_stats']['num_edges']}"
+        section += f"\n- Average visibility: {descriptor['graph_stats']['avg_visibility']:.2f}"
+        section += f"\n- Maximum limb span: {descriptor['graph_stats']['max_distance']:.3f}"
+        section += f"\n- Minimum limb span: {descriptor['graph_stats']['min_distance']:.3f}"
+        section += f"\n- Average distance: {descriptor['graph_stats']['avg_distance']:.3f}"
 
         return section
 
