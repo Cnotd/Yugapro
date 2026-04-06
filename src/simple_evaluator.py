@@ -9,6 +9,10 @@ from typing import Dict, List
 class SimpleEvaluator:
     """简化版评估器"""
     
+    @staticmethod
+    def _normalize_pose_standards(pose_standards: Dict) -> Dict:
+        return pose_standards if isinstance(pose_standards, dict) else {}
+
     def evaluate(self, stats: Dict, stability_score: float, 
               pose_name: str, pose_standards: Dict) -> Dict:
         """
@@ -24,6 +28,7 @@ class SimpleEvaluator:
             评估结果字典
         """
         # 1. 计算角度准确性 (40分)
+        pose_standards = self._normalize_pose_standards(pose_standards)
         accuracy_score = self._calculate_accuracy(stats, pose_standards)
         
         # 2. 计算动作稳定性 (30分)
@@ -57,6 +62,7 @@ class SimpleEvaluator:
     
     def _calculate_accuracy(self, stats: Dict, pose_standards: Dict) -> int:
         """计算角度准确性评分 (0-40分)"""
+        pose_standards = self._normalize_pose_standards(pose_standards)
         if "mean" not in stats or not pose_standards or "angles" not in pose_standards:
             return 20  # 默认中等分数
         
@@ -115,6 +121,7 @@ class SimpleEvaluator:
     
     def _identify_problems(self, stats: Dict, pose_standards: Dict) -> List[str]:
         """识别主要问题"""
+        pose_standards = self._normalize_pose_standards(pose_standards)
         problems = []
         
         if "mean" not in stats or not pose_standards or "angles" not in pose_standards:
@@ -151,6 +158,7 @@ class SimpleEvaluator:
     
     def _generate_suggestions(self, problems: List[str], pose_standards: Dict) -> List[str]:
         """生成改进建议"""
+        pose_standards = self._normalize_pose_standards(pose_standards)
         suggestions = []
         
         if "common_errors" in pose_standards:

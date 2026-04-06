@@ -1,0 +1,58 @@
+[package]
+name = "yoga-assessment-api"
+version = "0.1.0"
+edition = "2021"
+authors = ["Yoga Assessment Team"]
+description = "High-performance yoga pose assessment API backend"
+
+[dependencies]
+# Web框架
+axum = { version = "0.7", features = ["multipart"] }
+tokio = { version = "1", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "fs", "trace"] }
+
+# 序列化
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# 数据库
+sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite"] }
+
+# HTTP客户端
+reqwest = { version = "0.11", features = ["json", "multipart"] }
+
+# 图像处理
+image = "0.24"
+base64 = "0.21"
+
+# 配置管理
+config = "0.13"
+
+# 日志
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# 错误处理
+thiserror = "1"
+anyhow = "1"
+
+# 实用工具
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+mime = "0.3"
+futures = "0.3"
+async-trait = "0.1"
+
+[lib]
+name = "yoga_assessment"
+path = "src/lib.rs"
+
+[[bin]]
+name = "yoga-assessment-server"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

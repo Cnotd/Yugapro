@@ -146,6 +146,17 @@ OLLAMA_CONFIG = {
     "temperature": 0.7,
 }
 
+# 多模态 API 配置（替代 Ollama）
+MULTIMODAL_CONFIG = {
+    # 使用阿里云百炼 Qwen 多模态 API
+    "api_url": "https://dashscope.aliyuncs.com/api/v1",
+    "model": "qwen-vl-max",  # 最强大的多模态模型
+    "api_type": "qwen",
+    "api_key": "sk-eed0f038ff904cb09c4b3ae20bbf815d",
+    "timeout": 120,
+    "temperature": 0.7,
+}
+
 # 评估参数
 ASSESSMENT_CONFIG = {
     "stability_threshold": 0.05,  # 稳定性阈值

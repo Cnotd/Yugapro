@@ -432,7 +432,8 @@ GROUP BY DATE(assessment_time);
 -- ================================================================
 
 -- 更新用户进步记录触发器
-CREATE TRIGGER IF NOT EXISTS trigger_update_user_progress
+DROP TRIGGER IF EXISTS trigger_update_user_progress;
+CREATE TRIGGER trigger_update_user_progress
 AFTER INSERT ON assessment_record
 WHEN NEW.total_score IS NOT NULL
 BEGIN
@@ -526,11 +527,12 @@ BEGIN
         END,
         NEW.assessment_time,
         datetime('now', 'localtime')
-    WHERE user_id = NEW.user_id AND pose_name = NEW.pose_name;
+    ;
 END;
 
 -- 更新动作标准时间戳触发器
-CREATE TRIGGER IF NOT EXISTS trigger_update_pose_timestamp
+DROP TRIGGER IF EXISTS trigger_update_pose_timestamp;
+CREATE TRIGGER trigger_update_pose_timestamp
 AFTER UPDATE ON pose_standard
 BEGIN
     UPDATE pose_standard

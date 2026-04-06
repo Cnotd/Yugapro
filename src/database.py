@@ -3,8 +3,10 @@
 提供数据库初始化、CRUD操作、统计查询等功能
 """
 
+import os
 import sqlite3
 import json
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
@@ -14,14 +16,17 @@ from contextlib import contextmanager
 class DatabaseManager:
     """数据库管理器"""
 
-    def __init__(self, db_path: str = "data/yoga_assessment.db"):
+    def __init__(self, db_path: str = None):
         """
         初始化数据库管理器
 
         Args:
             db_path: 数据库文件路径
         """
-        self.db_path = db_path
+        self.db_path = db_path or os.environ.get(
+            "YOGA_DB_PATH",
+            str(Path(tempfile.gettempdir()) / "yuga_test" / "yoga_assessment.db")
+        )
         self._ensure_db_dir()
         self.init_database()
 
@@ -33,8 +38,9 @@ class DatabaseManager:
     @contextmanager
     def get_connection(self):
         """获取数据库连接(上下文管理器)"""
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30, check_same_thread=False)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
         try:
             yield conn
             conn.commit()
@@ -124,6 +130,27 @@ class DatabaseManager:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM user WHERE id = ?", (user_id,))
+            return cursor.rowcount > 0
+
+    def update_user_role(self, user_id: int, role: str) -> bool:
+        """更新用户角色"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE user SET role = ? WHERE id = ?", (role, user_id))
+            return cursor.rowcount > 0
+
+    def update_user_password(self, user_id: int, password_hash: str) -> bool:
+        """更新用户密码哈希。"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE user SET password = ? WHERE id = ?", (password_hash, user_id))
+            return cursor.rowcount > 0
+
+    def set_user_active(self, user_id: int, is_active: bool) -> bool:
+        """启用/禁用用户"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE user SET is_active = ? WHERE id = ?", (1 if is_active else 0, user_id))
             return cursor.rowcount > 0
 
     # ==================== 评估记录相关操作 ====================

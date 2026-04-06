@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>瑜伽动作智能评估系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="logo">
+                    <i class="fas fa-spa"></i>
+                    <h1>瑜伽动作智能评估系统</h1>
+                </div>
+                <nav class="nav">
+                    <a href="#" class="nav-link active" data-page="home">
+                        <i class="fas fa-home"></i> 首页
+                    </a>
+                    <a href="#" class="nav-link" data-page="assessment">
+                        <i class="fas fa-video"></i> 评估
+                    </a>
+                    <a href="#" class="nav-link" data-page="history">
+                        <i class="fas fa-history"></i> 历史
+                    </a>
+                    <a href="#" class="nav-link" data-page="profile" id="nav-profile" style="display: none;">
+                        <i class="fas fa-user-circle"></i> 个人
+                    </a>
+                    <a href="#" class="nav-link" data-page="admin" id="nav-admin" style="display: none;">
+                        <i class="fas fa-users-cog"></i> 管理
+                    </a>
+                    <a href="#" class="nav-link" data-page="about">
+                        <i class="fas fa-info-circle"></i> 关于
+                    </a>
+                    <a href="#" class="nav-link" data-page="login" id="nav-login">
+                        <i class="fas fa-sign-in-alt"></i> 登录
+                    </a>
+                    <a href="#" class="nav-link" data-page="register" id="nav-register">
+                        <i class="fas fa-user-plus"></i> 注册
+                    </a>
+                    <a href="#" class="nav-link" id="nav-logout" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> 退出
+                    </a>
+                </nav>
+                <div class="user-banner" id="user-banner" style="display: none;">
+                    <span id="user-welcome-name"></span>
+                    <span class="role-label" id="user-role-label"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Home Page -->
+            <section id="page-home" class="page active">
+                <div class="hero">
+                    <div class="hero-content">
+                        <h2>智能 · 专业 · 便捷</h2>
+                        <p>基于人工智能技术，为您提供专业的瑜伽动作评估服务</p>
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-assessments">0</span>
+                                <span class="stat-label">评估次数</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-users">0</span>
+                                <span class="stat-label">用户数量</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="avg-score">0</span>
+                                <span class="stat-label">平均评分</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-lg" onclick="switchPage('assessment')">
+                            <i class="fas fa-play"></i> 开始评估
+                        </button>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="pose-visualization">
+                            <svg viewBox="0 0 200 300" class="pose-svg">
+                                <!-- Simplified pose skeleton -->
+                                <circle cx="100" cy="40" r="20" class="landmark" data-point="nose"/>
+                                <line x1="100" y1="60" x2="70" y2="100" class="bone"/>
+                                <line x1="100" y1="60" x2="130" y2="100" class="bone"/>
+                                <circle cx="70" cy="100" r="8" class="landmark" data-point="left_shoulder"/>
+                                <circle cx="130" cy="100" r="8" class="landmark" data-point="right_shoulder"/>
+                                <line x1="70" y1="108" x2="50" y2="150" class="bone"/>
+                                <line x1="130" y1="108" x2="150" y2="150" class="bone"/>
+                                <circle cx="50" cy="150" r="6" class="landmark" data-point="left_elbow"/>
+                                <circle cx="150" cy="150" r="6" class="landmark" data-point="right_elbow"/>
+                                <line x1="70" y1="100" x2="70" y2="180" class="bone"/>
+                                <line x1="130" y1="100" x2="130" y2="180" class="bone"/>
+                                <circle cx="70" cy="180" r="8" class="landmark" data-point="left_hip"/>
+                                <circle cx="130" cy="180" r="8" class="landmark" data-point="right_hip"/>
+                                <line x1="70" y1="188" x2="60" y2="250" class="bone"/>
+                                <line x1="130" y1="188" x2="140" y2="250" class="bone"/>
+                                <circle cx="60" cy="250" r="6" class="landmark" data-point="left_knee"/>
+                                <circle cx="140" cy="250" r="6" class="landmark" data-point="right_knee"/>
+                                <line x1="60" y1="256" x2="50" y2="290" class="bone"/>
+                                <line x1="140" y1="256" x2="150" y2="290" class="bone"/>
+                                <circle cx="50" cy="290" r="5" class="landmark" data-point="left_ankle"/>
+                                <circle cx="150" cy="290" r="5" class="landmark" data-point="right_ankle"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features -->
+                <div class="features">
+                    <h3>系统特性</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-brain"></i>
+                            <h4>AI智能分析</h4>
+                            <p>基于大语言模型和专业姿态检测算法，提供精准的动作评估</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>隐私保护</h4>
+                            <p>完全本地化运行，视频数据不离开您的设备</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-bolt"></i>
+                            <h4>实时反馈</h4>
+                            <p>快速处理，即时获得评估结果和改进建议</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>进步追踪</h4>
+                            <p>记录您的练习历史，追踪瑜伽水平的提升</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assessment Page -->
+            <section id="page-assessment" class="page">
+                <div class="assessment-container">
+                    <div class="upload-section">
+                        <h3><i class="fas fa-upload"></i> 上传视频</h3>
+                        <div class="upload-area" id="upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>拖拽视频文件到这里，或点击选择</p>
+                            <span class="upload-hint">支持 MP4, AVI, MOV 格式，最大 100MB</span>
+                            <input type="file" id="video-input" accept="video/*" hidden>
+                        </div>
+                        <div class="upload-preview" id="upload-preview" style="display: none;">
+                            <video id="preview-video" controls></video>
+                            <button class="btn btn-sm btn-secondary" onclick="clearVideo()">
+                                <i class="fas fa-times"></i> 清除
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pose-selection">
+                        <h3><i class="fas fa-user"></i> 选择动作</h3>
+                        <div class="pose-grid" id="pose-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <button class="btn btn-primary btn-lg" id="assess-btn" disabled>
+                            <i class="fas fa-search"></i> 开始评估
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result Section (hidden initially) -->
+                <div class="result-section" id="result-section" style="display: none;">
+                    <h3><i class="fas fa-clipboard-check"></i> 评估结果</h3>
+
+                    <div class="result-content">
+                        <!-- Score Overview -->
+                        <div class="score-overview">
+                            <div class="total-score">
+                                <svg viewBox="0 0 120 120" class="score-ring">
+                                    <circle cx="60" cy="60" r="50" class="score-bg"/>
+                                    <circle cx="60" cy="60" r="50" class="score-progress" id="score-ring"/>
+                                </svg>
+                                <div class="score-text">
+                                    <span class="score-value" id="total-score">0</span>
+                                    <span class="score-max">/ 100</span>
+                                </div>
+                            </div>
+                            <div class="score-breakdown">
+                                <div class="score-item">
+                                    <span class="score-label">结构准确性</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" id="structure-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span class="score-value" id="structure-score">0/60</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="score-label">正位性</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" id="alignment-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span class="score-value" id="alignment-score">0/30</span>
+                                </div>
+                                <div class="score-item">
+                                    <span class="score-label">稳定性</span>
+                                    <div class="score-bar">
+                                        <div class="score-fill" id="stability-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span class="score-value" id="stability-score">0/10</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Angle Chart -->
+                        <div class="chart-section">
+                            <h4><i class="fas fa-chart-bar"></i> 关节角度数据</h4>
+                            <canvas id="angle-chart"></canvas>
+                        </div>
+
+                        <!-- Problems and Suggestions -->
+                        <div class="feedback-section">
+                            <div class="problems">
+                                <h4><i class="fas fa-exclamation-triangle"></i> 主要问题</h4>
+                                <ul id="problems-list">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+                            <div class="suggestions">
+                                <h4><i class="fas fa-lightbulb"></i> 改进建议</h4>
+                                <ul id="suggestions-list">
+                                    <!-- Populated dynamically -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Overlay -->
+                <div class="processing-overlay" id="processing-overlay" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>正在分析视频，请稍候...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Page -->
+            <section id="page-history" class="page">
+                <h3><i class="fas fa-history"></i> 评估历史</h3>
+                <div class="history-list" id="history-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- Profile Page -->
+            <section id="page-profile" class="page">
+                <div class="profile-card">
+                    <h3><i class="fas fa-user-circle"></i> 我的账户</h3>
+                    <div class="profile-details">
+                        <p><strong>用户名：</strong><span id="profile-username">-</span></p>
+                        <p><strong>邮箱：</strong><span id="profile-email">-</span></p>
+                        <p><strong>角色：</strong><span id="profile-role">Learner</span></p>
+                        <p><strong>状态：</strong><span id="profile-status">Active</span></p>
+                    </div>
+                </div>
+                <div class="role-card">
+                    <h4>权限说明</h4>
+                    <p id="role-info">登录后可查看您的评估历史、上传视频并获取个性化瑜伽动作建议。</p>
+                </div>
+            </section>
+
+            <!-- Admin Page -->
+            <section id="page-admin" class="page">
+                <div class="admin-card">
+                    <div class="admin-header">
+                        <div>
+                            <h3><i class="fas fa-users-cog"></i> 管理用户</h3>
+                            <p>管理员可以查看所有用户并修改角色或启用状态。</p>
+                        </div>
+                        <button class="btn btn-secondary" id="refresh-users-btn">
+                            <i class="fas fa-sync-alt"></i> 刷新列表
+                        </button>
+                    </div>
+
+                    <div class="admin-grid">
+                        <div class="admin-panel">
+                            <h4>创建新用户</h4>
+                            <form id="admin-create-user-form" class="auth-form">
+                                <label for="admin-username">用户名</label>
+                                <input type="text" id="admin-username" required>
+                                <label for="admin-email">邮箱</label>
+                                <input type="email" id="admin-email">
+                                <label for="admin-password">密码</label>
+                                <input type="password" id="admin-password" required>
+                                <label for="admin-role">角色</label>
+                                <select id="admin-role">
+                                    <option value="learner">学习者</option>
+                                    <option value="coach">教练</option>
+                                    <option value="admin">管理员</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">创建用户</button>
+                                <p class="auth-error" id="admin-create-error"></p>
+                                <p class="auth-success" id="admin-create-success"></p>
+                            </form>
+                        </div>
+
+                        <div class="admin-panel admin-list-panel">
+                            <h4>用户列表</h4>
+                            <div class="admin-table-wrapper">
+                                <table class="admin-table" id="admin-user-table">
+                                    <thead>
+                                        <tr>
+                                            <th>用户名</th>
+                                            <th>邮箱</th>
+                                            <th>角色</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- 用户列表由 JS 填充 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Login Page -->
+            <section id="page-login" class="page">
+                <div class="auth-card">
+                    <h3><i class="fas fa-sign-in-alt"></i> 用户登录</h3>
+                    <form id="login-form" class="auth-form">
+                        <label for="login-username">用户名</label>
+                        <input type="text" id="login-username" required>
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" required>
+                        <button type="submit" class="btn btn-primary">登录</button>
+                        <p class="auth-switch">还没有账号？ <a href="#" id="show-register">现在注册</a></p>
+                        <p class="auth-error" id="login-error"></p>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Register Page -->
+            <section id="page-register" class="page">
+                <div class="auth-card">
+                    <h3><i class="fas fa-user-plus"></i> 用户注册</h3>
+                    <form id="register-form" class="auth-form">
+                        <label for="register-username">用户名</label>
+                        <input type="text" id="register-username" required>
+                        <label for="register-email">邮箱</label>
+                        <input type="email" id="register-email" required>
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" required>
+                        <button type="submit" class="btn btn-primary">注册</button>
+                        <p class="auth-switch">已有账号？ <a href="#" id="show-login">直接登录</a></p>
+                        <p class="auth-error" id="register-error"></p>
+                    </form>
+                </div>
+            </section>
+
+            <!-- About Page -->
+            <section id="page-about" class="page">
+                <div class="about-content">
+                    <h3><i class="fas fa-info-circle"></i> 关于系统</h3>
+                    <div class="about-card">
+                        <h4>系统架构</h4>
+                        <p>本系统采用前后端分离架构：</p>
+                        <ul>
+                            <li><strong>后端</strong>：Rust + Axum 高性能Web框架</li>
+                            <li><strong>前端</strong>：原生JavaScript + CSS</li>
+                            <li><strong>数据库</strong>：SQLite 轻量级数据库</li>
+                            <li><strong>AI模型</strong>：Qwen3-4B 本地大语言模型</li>
+                        </ul>
+                    </div>
+                    <div class="about-card">
+                        <h4>技术特点</h4>
+                        <ul>
+                            <li>高性能：Rust后端提供卓越的处理速度</li>
+                            <li>安全可靠：本地化部署，数据不外传</li>
+                            <li>易于扩展：模块化设计，便于功能扩展</li>
+                            <li>跨平台：支持Windows、macOS、Linux</li>
+                        </ul>
+                    </div>
+                    <div class="about-card">
+                        <h4>版本信息</h4>
+                        <p>当前版本：<span id="version">1.0.0</span></p>
+                        <p>最后更新：2026-04-02</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 瑜伽动作智能评估系统 | 基于 Rust + JavaScript 构建</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/api.js?v=2"></script>
+    <script src="js/app.js?v=2"></script>
+</body>
+</html>

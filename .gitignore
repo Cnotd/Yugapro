@@ -56,3 +56,12 @@ data/temp/*
 output/
 *.log
 model_output.txt
+
+# Local databases and journals
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Rust build artifacts
+rust_backend/target/

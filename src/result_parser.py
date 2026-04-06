@@ -97,6 +97,9 @@ class ResultParser:
     def _validate_and_clean(self, data: Dict) -> Dict:
         """
         验证和清洗数据
+        支持两种格式:
+        1. 旧格式: {"score": {"total": ..., "accuracy": ..., "stability": ..., "coordination": ...}}
+        2. 新格式（Qwen API）: {"total_score": ..., "structure_score": ..., "alignment_score": ..., "stability_score": ...}
         
         Args:
             data: 原始数据
@@ -115,17 +118,41 @@ class ResultParser:
             "suggestions": []
         }
         
-        # 处理分数
+        # 处理两种分数格式
         if "score" in data and isinstance(data["score"], dict):
+            # 旧格式
             score = data["score"]
-            
-            # 确保各项分数是整数
             for key in ["total", "accuracy", "stability", "coordination"]:
                 if key in score:
                     try:
                         result["score"][key] = int(float(score[key]))
                     except (ValueError, TypeError):
                         result["score"][key] = 0
+        else:
+            # 新格式（Qwen API）- 检查是否有新格式的字段
+            if "total_score" in data:
+                try:
+                    result["score"]["total"] = int(float(data["total_score"]))
+                except (ValueError, TypeError):
+                    result["score"]["total"] = 0
+            
+            if "structure_score" in data:
+                try:
+                    result["score"]["accuracy"] = int(float(data["structure_score"]))
+                except (ValueError, TypeError):
+                    result["score"]["accuracy"] = 0
+            
+            if "alignment_score" in data:
+                try:
+                    result["score"]["stability"] = int(float(data["alignment_score"]))
+                except (ValueError, TypeError):
+                    result["score"]["stability"] = 0
+            
+            if "stability_score" in data:
+                try:
+                    result["score"]["coordination"] = int(float(data["stability_score"]))
+                except (ValueError, TypeError):
+                    result["score"]["coordination"] = 0
         
         # 处理问题列表
         if "problems" in data:
