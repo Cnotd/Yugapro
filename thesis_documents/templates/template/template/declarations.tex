@@ -1,0 +1,53 @@
+\newcommand{\heitchapter}[1]{%
+  \clearpage
+  \begin{center}
+    {\setstretch{1.5}\heiti\zihao{-2}#1\par}
+  \end{center}
+  \vspace{12pt}%
+}
+
+\newcommand{\declarationbodyfont}{%
+  \setstretch{1.25}\songti\zihao{-3}%
+}
+
+\newcommand{\signaturefield}[1]{%
+  \makebox[8em][l]{#1}%
+}
+
+% 前言部分使用罗马数字编号
+\pagenumbering{Roman}
+
+% 原创性声明
+%\chapter*{{\heiti\zihao{-2} 原创性声明}}
+\heitchapter{原创性声明}
+%\addcontentsline{toc}{chapter}{原创性声明}
+% 原创性声明正文使用宋体小三号，1.25倍行距
+{\declarationbodyfont
+
+\indent 本人郑重声明：本人所呈交的毕业设计（论文），是在指导老师的指导下独立进行研究所取得的成果。毕业设计（论文）中凡引用他人已经发表或未发表的成果、数据、观点等，均已明确注明出处。除文中已经注明引用的内容外，不包含任何其他个人或集体已经发表或撰写过的科研成果。对本文的研究成果做出重要贡献的个人和集体，均已在文中以明确方式标明。\\
+
+\indent 本声明的法律责任由本人承担。\\[2ex]
+
+\indent 论文作者签名：\signaturefield{\authorSignature} 日\quad 期：\thesisDeclarationDate\\
+%\indent 论文作者签名：\signaturefield{} 日期：\\
+}% 结束宋体小三号设置
+
+% 使用授权声明
+%\chapter*{{\heiti\zihao{-2} 关于使用授权的声明}}
+\heitchapter{关于使用授权的声明}
+%\addcontentsline{toc}{chapter}{关于使用授权的声明}
+% 使用授权声明正文使用宋体小三号，1.25倍行距
+{\declarationbodyfont
+
+\indent 本人在指导老师指导下所完成的毕业设计（论文）及相关的资\nobreak 料\nobreak（包括图纸、试验记录、原始数据、实物照片、图片、录音带、设计手稿
+
+\noindent 等），知识产权归属成都大学。本人完全了解成都大学有关保存、使用毕业设计（论文）的规定，本人授权成都大学可以将本毕业设计\nobreak（论文）的全部或部分内容编入有关数据库进行检索，可以采用任何复制手段保存和汇编本毕业设计（论文）。如果发表相关成果，一定征得指导教师同意，且第一署名单位为成都大学。本人离校后使用毕业设计\nobreak（论文）或与该论文直接相关的学术论文或成果时，第一署名单位仍然为成都大学。
+
+\indent 本毕业设计（论文）内容不涉及国家秘密、商业秘密及其他需要保密的内容，适用于上述授权。\\
+
+%\indent 论文作者签名：\signaturefield{} 日期：\\
+\indent 论文作者签名：\signaturefield{\authorSignature} 日\quad 期：\thesisDeclarationDate\\[2ex]
+
+
+\indent 指导教师签名：\signaturefield{} 日\quad 期：\\
+}% 结束宋体小三号设置

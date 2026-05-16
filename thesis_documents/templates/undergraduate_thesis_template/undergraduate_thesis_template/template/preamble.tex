@@ -1,0 +1,38 @@
+\usepackage{url}
+\usepackage{gbt7714}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amssymb,amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{pifont}
+
+
+\bibliographystyle{gbt7714-numerical}
+\makeatletter
+\def\NAT@cmprs{\@ne}
+\patchcmd{\NAT@citexnum}
+  {\def@NAT@last@yr{-\NAT@penalty}}
+  {%
+    \ifx\NAT@last@yr\relax
+      \def@NAT@last@yr{\@citea}%
+    \else
+      \def@NAT@last@yr{-\NAT@penalty}%
+    \fi
+  }
+  {}{\PackageWarning{thesis}{Failed to patch citation compression}}
+\makeatother
+
+\newcommand{\TNR}[1]{{\fontspec{Times New Roman}#1}}
+\newcommand{\circnum}[1]{\ding{\numexpr171+#1\relax}}

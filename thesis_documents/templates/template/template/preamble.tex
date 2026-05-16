@@ -1,0 +1,44 @@
+\usepackage{url}
+\IfFileExists{gbt7714.sty}{%
+  \usepackage{gbt7714}
+  \bibliographystyle{gbt7714-numerical}
+}{}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amssymb,amsmath}
+\usepackage{graphicx}
+\IfFileExists{caption.sty}{\usepackage{caption}}{}
+\IfFileExists{subcaption.sty}{\usepackage{subcaption}}{}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{array}
+\IfFileExists{algorithm.sty}{\usepackage{algorithm}}{}
+\IfFileExists{algorithmicx.sty}{\usepackage{algorithmicx}}{}
+\IfFileExists{algpseudocode.sty}{\usepackage{algpseudocode}}{}
+\IfFileExists{pifont.sty}{\usepackage{pifont}}{}
+
+\makeatletter
+\def\NAT@cmprs{\@ne}
+\patchcmd{\NAT@citexnum}
+  {\def@NAT@last@yr{-\NAT@penalty}}
+  {%
+    \ifx\NAT@last@yr\relax
+      \def@NAT@last@yr{\@citea}%
+    \else
+      \def@NAT@last@yr{-\NAT@penalty}%
+    \fi
+  }
+  {}{\PackageWarning{thesis}{Failed to patch citation compression}}
+\makeatother
+
+\newcommand{\TNR}[1]{{\fontspec{Times New Roman}#1}}
+\IfFileExists{pifont.sty}{%
+  \newcommand{\circnum}[1]{\ding{\numexpr171+##1\relax}}
+}{%
+  \newcommand{\circnum}[1]{(##1)}
+}

@@ -21,7 +21,7 @@ from src.prompt_builder import PromptBuilder
 from src.ollama_client import OllamaClient
 from src.result_parser import ResultParser
 from src.simple_evaluator import SimpleEvaluator
-from config.settings import POSE_STANDARDS
+from config.settings import POSE_STANDARDS, get_pose_standard
 
 app = Flask(__name__)
 
@@ -144,7 +144,7 @@ def index():
             
             <div class="info-box">
                 <strong>支持的瑜伽动作：</strong>
-                下犬式、树式、战士一式、三角式、猫牛式
+                下犬式、树式、战士一式、三角式、猫牛式、半月式
             </div>
             
             <form id="uploadForm" enctype="multipart/form-data">
@@ -161,6 +161,7 @@ def index():
                         <option value="战士一式">战士一式</option>
                         <option value="三角式">三角式</option>
                         <option value="猫牛式">猫牛式</option>
+                        <option value="半月式">半月式</option>
                     </select>
                 </div>
                 
@@ -275,7 +276,7 @@ def assess():
         stability_score = stats_calculator.compute_stability(landmarks_seq)
         
         # 构建提示词
-        pose_standard = POSE_STANDARDS.get(pose_name)
+        pose_standard = get_pose_standard(pose_name)
         prompt = prompt_builder.build(stats, stability_score, pose_name, pose_standard)
         
         # 调用大模型评估

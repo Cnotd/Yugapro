@@ -1,7 +1,9 @@
 """
 动作标准库配置文件
-包含5个瑜伽动作的标准角度范围和常见错误
+包含6个瑜伽动作的标准角度范围和常见错误
 """
+
+import os
 
 POSE_STANDARDS = {
     "下犬式": {
@@ -85,6 +87,23 @@ POSE_STANDARDS = {
     }
 }
 
+# 前端和接口使用英文体式名，规则库保留中文体式名；通过别名统一查表。
+POSE_NAME_ALIASES = {
+    "Downward Dog": "下犬式",
+    "Downward Facing Dog": "下犬式",
+    "Tree Pose": "树式",
+    "Warrior I": "战士一式",
+    "Triangle Pose": "三角式",
+    "Cat Cow Pose": "猫牛式",
+    "Half Moon Pose": "半月式",
+}
+
+
+def get_pose_standard(pose_name):
+    """按中文名或英文别名获取动作标准。"""
+    normalized_name = POSE_NAME_ALIASES.get(pose_name, pose_name)
+    return POSE_STANDARDS.get(normalized_name)
+
 # 关键点映射
 # MediaPipe Pose 33个关键点索引
 LANDMARKS_MAPPING = {
@@ -152,7 +171,7 @@ MULTIMODAL_CONFIG = {
     "api_url": "https://dashscope.aliyuncs.com/api/v1",
     "model": "qwen-vl-max",  # 最强大的多模态模型
     "api_type": "qwen",
-    "api_key": "sk-eed0f038ff904cb09c4b3ae20bbf815d",
+    "api_key": os.environ.get("QWEN_API_KEY", ""),
     "timeout": 120,
     "temperature": 0.7,
 }

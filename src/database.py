@@ -40,7 +40,11 @@ class DatabaseManager:
         """获取数据库连接(上下文管理器)"""
         conn = sqlite3.connect(self.db_path, timeout=30, check_same_thread=False)
         conn.row_factory = sqlite3.Row
+        # 启用外键、WAL 和 busy_timeout，降低后台写入与前端轮询读取之间的锁冲突。
         conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA journal_mode = WAL")
+        conn.execute("PRAGMA synchronous = NORMAL")
+        conn.execute("PRAGMA busy_timeout = 5000")
         try:
             yield conn
             conn.commit()
@@ -52,10 +56,15 @@ class DatabaseManager:
 
     def init_database(self):
         """初始化数据库,创建表结构"""
-        # 读取SQL文件
+        # 优先读取项目根目录 schema；若不存在，则使用 config 下的备选 schema。
         schema_path = Path(__file__).parent.parent / "database_schema.sql"
+        alt_schema_path = Path(__file__).resolve().parents[1] / "config" / "database_schema.sql"
+        if not schema_path.exists() and alt_schema_path.exists():
+            schema_path = alt_schema_path
         if not schema_path.exists():
-            raise FileNotFoundError(f"数据库Schema文件不存在: {schema_path}")
+            raise FileNotFoundError(
+                f"数据库Schema文件不存在: {schema_path}; 备选路径也不存在: {alt_schema_path}"
+            )
 
         with open(schema_path, 'r', encoding='utf-8') as f:
             sql_script = f.read()
@@ -63,6 +72,7 @@ class DatabaseManager:
         # 执行SQL脚本
         with self.get_connection() as conn:
             cursor = conn.cursor()
+            # executescript 支持一次性创建多张表和触发器。
             cursor.executescript(sql_script)
             print("数据库初始化成功")
 
@@ -187,6 +197,7 @@ class DatabaseManager:
         """
         with self.get_connection() as conn:
             cursor = conn.cursor()
+            # 列表和字典字段以 JSON 字符串存储，读取时再反序列化给前端。
             cursor.execute("""
                 INSERT INTO assessment_record (
                     user_id, video_name, video_path, pose_name, assessment_time,

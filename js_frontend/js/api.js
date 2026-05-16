@@ -23,6 +23,7 @@ class YogaAPI {
         }
 
         try {
+            // 页面刷新后从 localStorage 恢复登录态，减少重复登录。
             const session = JSON.parse(raw);
             this.accessToken = session.access_token || null;
             this.refreshToken = session.refresh_token || null;
@@ -76,6 +77,7 @@ class YogaAPI {
             return false;
         }
 
+        // 提前 30 秒刷新 access token，避免请求发出时刚好过期。
         if (Date.now() >= this.expiresAt - 30000) {
             return await this.refreshTokenIfNeeded();
         }
@@ -127,6 +129,7 @@ class YogaAPI {
         const url = `${this.baseUrl}${path}`;
         const isAuthRoute = path.startsWith('/auth/');
 
+        // 非认证接口统一走令牌检查，调用方不用重复处理登录状态。
         if (!isAuthRoute) {
             const ok = await this.ensureAccessToken();
             if (!ok) {
@@ -140,6 +143,7 @@ class YogaAPI {
             headers.set('Content-Type', 'application/json');
         }
 
+        // 上传 FormData 时不能手动设置 Content-Type，浏览器需要自动补 boundary。
         if (!isAuthRoute && this.accessToken) {
             headers.set('Authorization', `Bearer ${this.accessToken}`);
         }
@@ -150,6 +154,7 @@ class YogaAPI {
         });
 
         if (response.status === 401 && !isAuthRoute) {
+            // access token 过期时自动刷新并重试一次，提升长时间打开页面的可用性。
             const refreshed = await this.refreshTokenIfNeeded();
             if (refreshed) {
                 if (this.accessToken) {
@@ -207,6 +212,7 @@ class YogaAPI {
         formData.append('video', file);
         formData.append('pose_name', poseName);
 
+        // 后端会立即返回任务 id，真正的视频分析在后台线程中执行。
         const response = await this.authFetch('/assessment/upload', {
             method: 'POST',
             body: formData,
@@ -325,16 +331,19 @@ class YogaAPI {
 
     async pollAssessment(assessmentId, onProgress = null, maxAttempts = 300) {
         for (let i = 0; i < maxAttempts; i++) {
+            // 前端不阻塞等待分析完成，而是按固定间隔查询后台任务状态。
             const status = await this.getAssessment(assessmentId);
             if (onProgress) {
                 onProgress(status);
             }
             if (status.status === 'completed') {
+                // 后端 completed 时已经把结果写入任务对象，可直接返回给页面渲染。
                 return status.result;
             }
             if (status.status === 'failed') {
                 throw new Error((status.result && status.result.error) || status.error || 'Assessment failed');
             }
+            // 1 秒轮询一次，兼顾响应速度和后端压力。
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
         throw new Error('Assessment timeout');

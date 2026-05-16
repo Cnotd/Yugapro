@@ -1,0 +1,273 @@
+\documentclass[UTF8,twoside]{ctexrep}
+\input{template/preamble}
+
+%--------------------------- 这里放你的个人信息 ---------------------------%
+\newcommand{\thesisTitleLineA}{面向异构计算平台的复杂印刷文档}
+\newcommand{\thesisTitleLineB}{手写字擦除算法研究}
+\newcommand{\thesisCollege}{计算机学院}
+\newcommand{\thesisMajor}{物联网工程}
+\newcommand{\thesisMajorEn}{Internet of Things Engineering}
+\newcommand{\studentName}{卢智贤}
+\newcommand{\studentNameEn}{Zhixian Lu}
+\newcommand{\studentId}{202210422125}
+\newcommand{\studentClass}{2022级1班}
+\newcommand{\advisorName}{张楗伟}
+\newcommand{\advisorNameEn}{Jianwei Zhang}
+\newcommand{\advisorTitle}{讲师}
+\newcommand{\thesisCompletionDate}{2026 年 \quad 3 月 \quad 23 日}
+\newcommand{\thesisDeclarationDate}{2026年3月23日}
+
+
+%--------------------------- 这里放你的电子签名 ---------------------------%
+\newcommand{\authorSignature}{} % 不放电子签名时保持为空
+%\renewcommand{\authorSignature}{\includegraphics[height=1.2cm]{figs/signature.png}} % 放电子签名时取消注释并填写图片路径
+
+\input{template/style}
+
+% 封面
+\begin{document}
+
+\input{template/cover}
+\input{template/declarations}
+
+
+
+%-------------------------- 这里是你的中文摘要信息 --------------------------%
+% 中文摘要
+\newcommand{\abstractPersonalInfoIndent}{10em}     % 调这个11em，让你的个人信息居中
+\makeChineseAbstractHeader                         % 依次填写题目，专业，学号，姓名和指导老师
+  {面向异构计算平台的复杂印刷文档手写字擦除算法研究}
+  {物联网工程}
+  {202210422125}
+  {卢智贤}
+  {张楗伟}
+
+%-------------------------- 这里是你的中文摘要正文 --------------------------%
+\ChineseAbstractTextStart
+% 这里写入摘要内容，换一行开始写，不要换多行
+“摘要”是摘要部分的标题，不可省略。“摘要”字体：黑体，居左，不缩进，字号：小四号。
+
+摘要是对论文内容不加注释和评论的简短陈述，要求扼要说明研究工作的目的、主要材料和方法、研究结果、结论、科学意义或应用价值等，是一篇具有独立性和完整性的短文。摘要中不宜使用公式、图表以及非公知公用的符号和术语，不标注引用文献编号。
+
+摘要正文选用模板中的样式所定义的“正文”，每段落首行缩进2个汉字；或者手动设置成每段落首行缩进2个汉字，字体：宋体，字号：小四号，行距：多倍行距1.25，间距：段前、段后均为0行，取消网格对齐选项。
+
+摘要篇幅以1页为限，字数300-600字左右。
+
+关键词是供检索用的主题词条，应采用能覆盖论文主要内容的通用技术词条（参照相应的技术术语标准），一般列3～5个，关键词不能与专业名称、研究方向重复，按词条的外延层次从大到小排列，应在摘要中出现。
+
+
+
+\ChineseAbstractTextFinish
+
+%-------------------------- 这里是中文摘要的关键词 --------------------------%
+\makeChineseKeywords{写作规范；排版格式；毕业设计（论文）}
+
+%-------------------------- 这里是你的英文摘要信息 --------------------------%
+\newcommand{\englishAbstractPersonalInfoIndent}{5em} % 调这个3em，让你的个人信息居中
+\makeEnglishAbstractHeader                           % 依次填写题目，专业，学号，姓名和指导老师
+  {Handwritten Text Removal in Complex Printed Documents for Heterogeneous Computing Platforms}
+  {Internet of Things Engineering}
+  {202210422125}
+  {Zhixian Lu}
+  {Jianwei Zhang}
+
+%-------------------------- 这里是你的英文摘要正文 --------------------------%
+\EnglishAbstractTextStart
+外文摘要要求用英文书写，内容应与“中文摘要”对应。使用第三人称，最好采用现在时态编写。
+
+“Abstract”：居左，字体：Times New Roman，不缩进，字号：小四号，加粗，多倍行距1.25倍行距，段前为0行，段后12磅。
+Abstract正文选用设置成每段落首行缩进2字，字体：Times New Roman，字号：小四号，行距：多倍行距 1.25，间距：段前、段后均为0行，取消网格对齐选项。
+
+Key words与摘要正文之间空一行。Key words与中文“关键词”一致。词间用分号（英文）加1个空格间隔，末尾不加标点，3～5个；Times New Roman，小四号。
+
+
+\EnglishAbstractTextFinish
+%-------------------------- 这里是英文摘要的关键词 --------------------------%
+\makeEnglishKeywords{Write Criterion;Typeset Format;Graduation Project (Thesis)}
+
+
+
+%-------------------------- 这里是目录，不需要更改 --------------------------%
+\clearpage
+\begin{center}
+  {\songti\zihao{-2}\bfseries 目录}
+\end{center}
+\vspace{1.5em}
+
+\makeatletter
+\@starttoc{toc}
+\makeatother
+
+
+\clearpage
+\pagenumbering{arabic}
+\ThesisBodyStyle
+
+
+%-------------------------- 这里是你的论文正文部分 --------------------------%
+% 第一章 绪论
+\chapter{绪论}
+编写正文的时候，换两行，段首会自动缩进。
+
+只换一行，会和下面一样视为一整个段落，粘在一起。
+
+绪论应综合评述前人工作，说明主要说明论文撰写的目的、国内外研究现状及现实意义、对所研究问题的认识，并提出论文的中心论点等。该部分内容在正文中单独成章。从绪论开始，是正文的起始页，页码从1开始顺序编排。
+针对做毕业设计：说明毕业设计的方案理解，阐述设计方法和设计依据，讨论对设计重点的理解和解决思路。
+针对做毕业论文：说明论文的主题和选题的范围；对本论文研究主要范围内已有文献的评述；说明本论文所要解决的问题。建议与相关历史回顾、前人工作的文献评论、理论分析等相结合。
+注意：是否如实引用前人结果反映的是学术道德问题，应明确写出同行相近的和已取得的成果，避免抄袭之嫌。注意不要与摘要内容雷同。
+
+
+\noindent 如果你想强制换行，并且不像缩进，像这样用noindent
+
+
+\indent 如果你想强制换行，并且需要缩进，像这样用indent，当然大部分情况下，你不需要手动加indent
+
+
+\section{研究背景及意义}
+
+正文是毕业设计（论文）的主体，是毕业论文或设计说明书的核心部分。要求学生运用所学的数学、自然科学、工程基础和专业知识解决复杂问题的能力，能够针对问题设计解决方案，在设计环节中体现创新意识，并考虑社会、健康、安全、法律、文化、环境以及社会可持续发展等因素；要着重反映毕业设计或论文的工作，要突出毕业设计的设计过程、设计依据及解决问题的方法；毕业论文重点要突出研究的新见解，例如新思想、新观点、新规律、新研究方法以及新结果等。
+
+
+\section{国内外研究现状}\label{sec:demo_sec}
+像这样用cite引用参考文献，被引用的参考文献会自动展示在“参考文献章节”~\cite{cduref_book_chen2000,cduref_book_niu2012,cduref_standard_gbt25100,cduref_book_online_lou2011,cduref_journal_desmarais1992,cduref_journal_newspaper_ding2000,cduref_newspaper_ding2000,cduref_newspaper_zhang2000,cduref_conference_china1990,cduref_conference_rosenthall1963,cduref_incollection_standard1988,cduref_incollection_han1985,cduref_incollection_lou2011,cduref_incollection_martin1966,cduref_thesis_zhang1998,cduref_thesis_calms1965,cduref_patent_liu1993,cduref_patent_hebei2001,cduref_patent_koseki2002,cduref_report_usdot1990,cduref_report_who1970,cduref_electronic_jiang1999,cduref_electronic_xiao2001,cduref_electronic_metcalf1995,cduref_electronic_turcotte1992}。
+
+如果你想引用某一个章节，就在那个章节后面加label，像这样引用任意章节~\ref{sec:demo_sec}
+
+\section{面临的问题和挑战}
+
+
+\begin{researchlist}
+  \researchitem{使用searchlist来定义列表项}{
+    使用researchlist，而不是latex默认的enumerate
+  }
+
+  \researchitem{标准格式用法}{
+    将标题写在researchitem里的第一个花括号，将正文内容写在第二个花括号
+  }
+
+  \researchitem{设计了一个XXX系统}{
+    本文基于XXX开发，设计了一个XXX系统，。。。。
+  }
+  \researchitem{本文实现了XXX算法}{
+     本文实现了一个基于XXX的算法，在XXX上取得了XXX的成绩。。。
+  }
+\end{researchlist}
+
+\section{主要研究内容和贡献}
+
+
+这样在文中里加图片，通过width调整图片大小，高度会自动缩放
+
+你还可以根据label引用它~\ref{fig:dl_architecture}
+
+\begin{figure}[htb]
+		\centering
+		\includegraphics[width=0.6\linewidth]{./figs/architecture.pdf}
+		\caption{基于多尺度多任务学习的手写字擦除网络结构。}
+    \label{fig:dl_architecture}
+
+\end{figure}
+
+
+注意编写你的caption，简单描述图片内容即可，如果你要分析图片，在正文中引用它，并具体介绍如何分析，比如：
+
+本文采用的神经网络结构如图~\ref{fig:dl_architecture} 所示。整体模型由粗擦除网络、掩码辅助分支和精修复模块组成。粗擦除网络采用编码器-解码器结构和精细特征路径，用于生成初步的手写字擦除结果；掩码辅助分支在训练阶段提供像素级语义监督，用于约束网络区分背景、手写字、打印字和重叠区域；精修复模块则在粗擦除结果的基础上进一步修复局部残痕和边界损伤。三者共同构成多任务联合学习框架。
+
+
+具体来说，粗擦除网络是以 ResNet-18 为下采样网络的的UNet-like编码器—解码器网络，。。。。
+
+你甚至可以一行插入多张图片
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{./figs/opencv/8.png}
+        \caption{开始编译。}
+        \label{fig:opencv8}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\linewidth}
+        \centering
+         \includegraphics[width=\linewidth]{./figs/opencv/9.png}
+        \caption{编译结束。}
+        \label{fig:opencv9}
+    \end{subfigure}
+
+    \caption{编译生成依赖库。}
+    \label{fig:opencv_build}
+\end{figure}
+
+\section{本文组织结构}
+像这样编辑表格，你仍然可以引用它~\ref{tab:rhd_ablation}
+
+表格的caption同样要简洁，用来描述表达表格包含了什么内容
+
+\begin{table}[htb]
+    \centering
+    \caption{区域感知特征消融实验结果}
+    \begin{tabular}{lcc}
+        \toprule
+        特征设置 & MAD-HPTS Accuracy(\%) & PHD-AS Accuracy(\%) \\
+        \midrule
+        完整 RHD & 96.90 & 83.80 \\
+        去除均值特征 & 96.00 & 83.25 \\
+        去除 SSD 特征 & 96.51 & 81.50 \\
+        去除面积特征 & 96.35 & 81.38 \\
+        去除长宽比特征 & 96.36 & 83.00 \\
+        去除统计特征（均值 + SSD） & 93.59 & 77.13 \\
+        去除形状特征（面积 + 长宽比） & 93.60 & 73.38 \\
+        完整特征但不进行区域划分 & 65.26 & 81.63 \\
+        \bottomrule
+    \end{tabular}
+    \label{tab:rhd_ablation}
+\end{table}
+
+
+\chapter{这是一级标题}
+chapter定义一级别标题
+
+\section{这是二级标题}
+section定义二级标题
+
+\subsection{这是三级标题}
+subsection定义三级标题
+
+\fourthsection{这是四级标题}
+“（1）”数字编号是成大论文要求的，
+
+用foursubsection定义四级标题，这是该项里的模板写法。
+
+不要用subsubsection，它不会自动编号。
+
+
+
+
+% 结论
+\chapter{总结与展望}
+这里写你的结论
+\section{本文工作总结}
+\section{未来工作展望}
+
+
+%---------------------------- 这里是参考文献 ----------------------------%
+\addcontentsline{toc}{chapter}{参考文献}
+% 具体内容在reference.bib里填写，这里会自动引用，你不需要更改
+\bibliography{reference}
+
+
+
+%---------------------------- 这里是附录部分 ----------------------------%
+\chapter*{附录一　附录名称}
+\addcontentsline{toc}{chapter}{附录一　附录名称}
+
+这里挂你的附件，如果没有就把整章删除或者注释
+
+%---------------------------- 这里是致谢部分 ----------------------------%
+\chapter*{致谢}
+\addcontentsline{toc}{chapter}{致谢}
+
+用chapter*表示不编号的一级标题。addcontentsline用来把这个段落加到目录里
+
+光阴似箭，大学四年恍惚般便过去，期间，我从被动学习理论知识，到第一次上手实践落地项目，再到主动学习、探索，我很庆幸我花费了比周围同学更多的付出，这样让我在临近毕业时，切实感觉到自己收获颇丰。学无止境，当自己逐渐在某一领域略知一二时才能意识到，前人的奠基多么伟大，自己的工作多么渺小，未来的研究之路又是多么遥远。在这个过程中，我十分感恩成都大学内的老师、同学，以及我的家人长久陪伴着我，为我学习提供坚实的基础和动力。
+
+\end{document}

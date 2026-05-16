@@ -1,0 +1,31 @@
+\makeChineseAbstractHeader
+  {基于多模态大模型的瑜伽动作评估系统}
+  {计算机科学与技术}
+  {202210305212}
+  {曹黎骏}
+  {张楗伟}
+\ChineseAbstractTextStart
+本文所研究的居家瑜伽练习动作评估问题是，很多居家瑜伽练习者跟着练瑜伽视频能跳动作，但是对动作关节、身体对齐、动作稳定是否做到位是没有办法正确反馈的。正位与控制是瑜伽训练中重要的一环，如果肩、髋、膝、脊柱长期处在不合理的正位中，训练的效果会因肢体的问题而减缩，运动损伤的风险也会愈加大，线下教练对动作的纠正是即时可以反馈的，但是会受到时间、位置、费用等条件的约束，而居家练习瑜伽的更多是居家练习者，更需要一套可以反复使用、反馈相对清晰，并且易于留存的辅助评估工具。
+
+围绕这一需求，本文设计与实现了一套基于多模态大模型的瑜伽动作评估系统，其采用前后端分离的架构进行实现：前端通过HTML、CSS和原生JavaScript实现注册登录，视频上传，任务轮询与结果展示的功能；以Flask为后端框架为其提供RESTful接口，并辅以SQLite来储存相应的用户信息、视频任务、评估记录与系统日志。算法上，以采用MediaPipe Pose\textsuperscript{[1][6]}为底层姿态提取工具，提取视频的33个身体关键点后，通过几何计算、时序统计等方式计算出关节角度、对身体对等的偏差、动作稳定程度等结构化特征。
+
+在评估方法上，本文并未完全移交给外部模型打分的过程，系统保留了本地规则评估模块，由其根据动作标准库完成规则执行的基础打分和问题定位，再将关键帧/规则结果/结构化特征发送给网上的千问模型\textsuperscript{[8]}，由其帮助生成更加自然的反馈文本和改善建议。这么做可以使得评估结果尽量可解释同时也可以在网络服务不太稳定的时候提供降级的结果。系统中先后经历了Python原型验证、Rust后端试做、Flask工程化落地三个阶段，目前已在联调中先后发现角色字段不一致、任务同步阻塞、SQLite锁冲突、数据库触发器错误、空对象引用、代理变量干扰模型请求数据的问题。
+
+最终实现系统已经完成了注册、登录、视频上传、后台异步处理、状态查询、结果回显、历史记录留存等主要链路，测试亦表明了系统可以在本地环境下完成完整的视频输入和评估输出流程，且至少在部分异常场景下保证基本可用。姿态估计算法本身并非本文主要工作，仅仅作为任务输入端的一种实现形式，重点还是在于把视觉分析、规则推断、多模态反馈、Web工程实现整合成一套可以运行、可以验证、也可以继续扩展的毕设原型。
+\ChineseAbstractTextFinish
+\makeChineseKeywords{瑜伽动作评估；多模态大模型；MediaPipe；Flask框架；前后端分离；姿态估计}
+
+\makeEnglishAbstractHeader
+  {Yoga Action Assessment System Based on Multimodal Large Language Models}
+  {Computer Science and Technology}
+  {202210305212}
+  {Cao Li Jun}
+  {Zhang Jian Wei}
+\EnglishAbstractTextStart
+This thesis addresses a practical problem in home yoga training: learners may follow a pose video, but they still cannot easily judge whether their movement is aligned well enough. To deal with this issue, the project implements a yoga action assessment system that combines pose estimation, rule-based analysis, and multimodal language feedback.
+
+The system uses a frontend-backend architecture. The frontend is built with HTML, CSS, and vanilla JavaScript for upload, polling, and result display. The backend is implemented with Flask, and SQLite is used to store user data, task records, assessment results, and logs. In the analysis stage, MediaPipe Pose extracts 33 body landmarks from video frames, and geometric calculations are then used to derive joint angles, alignment deviation, and motion stability features.
+
+For evaluation, the project keeps a local rule-based scoring mechanism as the baseline and uses the Qwen multimodal model to convert structured errors and keyframe information into readable corrective suggestions. This design also makes fallback possible when the external model service is unstable. During development, several engineering issues were handled, including API field mismatch, SQLite locking, blocking processing, and proxy interference. The final system can complete the main assessment workflow on a local machine and generate usable feedback for yoga practice.
+\EnglishAbstractTextFinish
+\makeEnglishKeywords{Yoga Action Assessment; Multimodal Large Language Model; MediaPipe; Flask; Frontend-Backend Separation; Pose Estimation}

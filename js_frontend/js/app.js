@@ -24,7 +24,8 @@ const poseNameMap = {
     '树式': 'Tree Pose',
     '战士二式': 'Warrior II',
     '三角式': 'Triangle Pose',
-    '椅子式': 'Chair Pose'
+    '椅子式': 'Chair Pose',
+    '半月式': 'Half Moon Pose'
 };
 
 // DOM Elements
@@ -296,7 +297,8 @@ function renderPoseGrid() {
         'Tree Pose': 'fa-tree',
         'Warrior II': 'fa-shield-alt',
         'Triangle Pose': 'fa-triangle',
-        'Chair Pose': 'fa-chair'
+        'Chair Pose': 'fa-chair',
+        'Half Moon Pose': 'fa-moon'
     };
     
     // 反向映射：英文 -> 中文
@@ -345,7 +347,7 @@ async function startAssessment() {
     progressFill.style.width = '10%';
 
     try {
-        // Upload video
+        // 先上传视频拿到任务 id，后续评估进度由轮询接口驱动。
         const uploadResult = await api.uploadVideo(
             appState.selectedVideo,
             appState.selectedPose
@@ -355,7 +357,7 @@ async function startAssessment() {
         appState.currentAssessmentId = uploadResult.id || uploadResult.assessment_id;
         progressFill.style.width = '50%';
 
-        // Poll for result
+        // 轮询期间只更新进度条，不直接假设后端已经生成结果。
         const result = await api.pollAssessment(
             appState.currentAssessmentId,
             (status) => {
@@ -368,7 +370,7 @@ async function startAssessment() {
         appState.assessmentResult = result;
         progressFill.style.width = '100%';
 
-        // Hide processing, show results
+        // 等进度动画收尾后再切换结果区，避免界面突然跳变。
         setTimeout(() => {
             elements.processingOverlay.style.display = 'none';
             showResults(result);
@@ -386,6 +388,7 @@ async function startAssessment() {
  */
 function showResults(result) {
     elements.resultSection.style.display = 'block';
+    // 后端可能因模型兜底返回空数组，这里统一做类型保护，避免渲染报错。
     const angleData = result.angle_data || {};
     const problems = Array.isArray(result.problems) ? result.problems : [];
     const suggestions = Array.isArray(result.suggestions) ? result.suggestions : [];
@@ -459,16 +462,22 @@ function renderAngleChart(angleData) {
     canvas.width = canvas.parentElement.clientWidth;
     canvas.height = 250;
 
+    // 后端实际返回的是统计对象：{ mean: {...}, std: {...} }。
+    // 这里优先显示平均角度，同时兼容旧版直接扁平返回角度的格式。
+    const meanAngles = angleData && typeof angleData.mean === 'object'
+        ? angleData.mean
+        : angleData || {};
+
     const labels = ['左肘', '右肘', '左膝', '右膝', '左髋', '右髋', '左肩', '右肩'];
     const values = [
-        angleData.left_elbow || 0,
-        angleData.right_elbow || 0,
-        angleData.left_knee || 0,
-        angleData.right_knee || 0,
-        angleData.left_hip || 0,
-        angleData.right_hip || 0,
-        angleData.left_shoulder || 0,
-        angleData.right_shoulder || 0
+        meanAngles.left_elbow || 0,
+        meanAngles.right_elbow || 0,
+        meanAngles.left_knee || 0,
+        meanAngles.right_knee || 0,
+        meanAngles.left_hip || 0,
+        meanAngles.right_hip || 0,
+        meanAngles.left_shoulder || 0,
+        meanAngles.right_shoulder || 0
     ];
 
     // Clear canvas
@@ -520,6 +529,7 @@ function renderAngleChart(angleData) {
 async function loadHistory() {
     try {
         const data = await api.getUserAssessments();
+        // 兼容新旧接口：有的版本直接返回数组，有的版本包在 assessments 字段中。
         const assessments = Array.isArray(data) ? data : (data.assessments || []);
 
         if (!assessments.length) {
@@ -533,6 +543,7 @@ async function loadHistory() {
         }
 
         elements.historyList.innerHTML = assessments.map(item => {
+            // 历史记录来自数据库归档，字段可能随版本演进，因此渲染时保留兜底值。
             const timestamp = new Date(item.created_at || item.timestamp || Date.now()).toLocaleString();
             const statusText = item.status ? item.status.toUpperCase() : 'COMPLETED';
             const score = item.total_score?.toFixed ? item.total_score.toFixed(0) : item.total_score || 'N/A';
@@ -652,8 +663,6 @@ function getRoleDescription(role) {
     switch (role) {
         case 'admin':
             return '管理员拥有全部用户管理权限，可查看系统概况、管理用户以及审核教练申请。';
-        case 'coach':
-            return '教练可以查看学员历史、分析动作趋势，并为学员提供专业建议。';
         default:
             return '学习者可以上传视频、查看评估历史，并获得个性化动作优化建议。';
     }
@@ -751,7 +760,7 @@ function renderAdminUsers(users) {
 
     tbody.innerHTML = users.map(user => {
 const activeLabel = user.is_active ? '禁用' : '启用';
-        const roleOptions = ['learner', 'coach', 'admin'].map(role => `
+        const roleOptions = ['learner', 'admin'].map(role => `
             <option value="${role}" ${user.role === role ? 'selected' : ''}>
                 ${capitalizeRole(role)}
             </option>

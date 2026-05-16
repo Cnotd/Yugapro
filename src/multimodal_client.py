@@ -45,6 +45,8 @@ class MultimodalClient:
     def check_connection(self) -> bool:
         """检查与 API 的连接"""
         try:
+            if self.api_type in {"openai", "claude", "gemini", "qwen"} and not self.api_key:
+                return False
             if self.api_type == "openai":
                 headers = {"Authorization": f"Bearer {self.api_key}"}
                 response = requests.get("https://api.openai.com/v1/models", headers=headers, timeout=5)
@@ -83,8 +85,10 @@ class MultimodalClient:
         Returns:
             分析结果文本
         """
+        # 所有供应商接口统一接收 base64 图像，便于在不同模型之间切换。
         image_base64 = self._image_to_base64(image)
         
+        # 根据配置选择具体的多模态服务，业务层不需要关心厂商协议差异。
         if self.api_type == "openai":
             return self._openai_request(image_base64, prompt)
         elif self.api_type == "claude":
@@ -301,7 +305,7 @@ class MultimodalClient:
                 "Content-Type": "application/json"
             }
             
-            # 阿里云百炼 Qwen VL API 格式
+            # 阿里云百炼 Qwen VL API 格式，图像和文本放在同一条 user 消息中。
             payload = {
                 "model": self.model,  # qwen-vl-max, qwen-vl-plus
                 "input": {
@@ -402,7 +406,7 @@ class MultimodalClient:
         Returns:
             base64 编码的图像字符串
         """
-        # 如果是 numpy 数组，转换为 PIL.Image
+        # 评估流水线可能传入 numpy 帧，也可能传入 PIL 图像，这里统一转成 JPEG。
         if isinstance(image, np.ndarray):
             image = Image.fromarray(np.uint8(image))
         

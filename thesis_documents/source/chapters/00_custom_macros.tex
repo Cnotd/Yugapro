@@ -1,0 +1,691 @@
+\makeatletter
+\newcommand{\YogaCaptionNoColon}[1]{%
+  \begingroup
+  \renewcommand{\@makecaption}[2]{%
+    \vskip 6pt%
+    \sbox\@tempboxa{\small ##1\quad ##2}%
+    \ifdim \wd\@tempboxa >\hsize
+      {\small ##1\quad ##2\par}%
+    \else
+      \global\@minipagefalse
+      \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+    \fi
+    \vskip\belowcaptionskip}%
+  \caption{#1}%
+  \endgroup}
+\makeatother
+
+\newcommand{\YogaSystemArchitectureTikZ}{%
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.9cm and 0.8cm,
+  layer/.style={rectangle, draw=black!40, rounded corners=6pt, minimum width=14cm, minimum height=1.1cm, font=\sffamily\bfseries\zihao{5}, align=center, fill=white!92!cyan, inner sep=5pt},
+  module/.style={rectangle, draw=black!35, rounded corners=4pt, minimum width=2.9cm, minimum height=0.85cm, font=\sffamily\zihao{6}, align=center, fill=white!94!blue, inner sep=4pt},
+  arrow/.style={->, >=Latex, line width=0.8pt, draw=black!70, rounded corners=3pt},
+  annot/.style={font=\sffamily\zihao{6}, fill=white, inner sep=2pt}
+]
+  % overall background panel
+  \draw[fill=black!5, draw=none, rounded corners=8pt] (-7.6,1.8) rectangle (7.6,-6.3);
+
+  \node[font=\sffamily\zihao{6}] (user) at (-4.5, 1.2) {普通用户(学员)};
+  \node[font=\sffamily\zihao{6}] (admin) at (4.5, 1.2) {管理员};
+
+  \node[layer] (frontend) at (0,0) {前端展示层\\(HTML5 + CSS3 + 原生 JavaScript)};
+  \node[module, below=0.35cm of frontend, xshift=-4.8cm] (ui) {UI组件库};
+  \node[module, right=0.35cm of ui] (polling) {长轮询管理器};
+  \node[module, right=0.35cm of polling] (upload) {分块上传组件};
+  \node[module, right=0.35cm of upload] (chart) {可视化渲染};
+  \draw[arrow] (user.south) |- ++(0,-0.45) -| (frontend.north-|user);
+  \draw[arrow] (admin.south) |- ++(0,-0.45) -| (frontend.north-|admin);
+
+  \draw[annot] (-6,-1.5) -- (6,-1.5)
+    node[midway, above=0.1cm, annot] {HTTP/JSON + JWT 鉴权};
+
+  \node[layer, fill=white!92!orange, draw=black!40, below=0.8cm of frontend] (backend) {后端服务层\\(Flask + Python threading)};
+  \node[module, below=0.35cm of backend, xshift=-4.8cm, fill=white!94!orange] (router) {路由分发};
+  \node[module, right=0.35cm of router, fill=white!94!orange] (auth) {JWT鉴权拦截};
+  \node[module, right=0.35cm of auth, fill=white!94!orange] (taskmgr) {任务管理器};
+  \node[module, right=0.35cm of taskmgr, fill=white!94!orange] (cors) {CORS跨域};
+
+  \draw[annot] (-6,-3.2) -- (6,-3.2)
+    node[midway, above=0.1cm, annot] {threading 后台线程 + 任务状态字典};
+
+  \node[layer, fill=white!92!purple, draw=black!40, below=0.8cm of backend] (algorithm) {核心算法分析层\\(Worker 守护线程)};
+  \node[module, below=0.35cm of algorithm, xshift=-4.8cm, fill=white!95!purple] (opencv) {视频解码\\(OpenCV)};
+  \node[module, right=0.35cm of opencv, fill=white!95!purple] (mediapipe) {姿态估计\\(MediaPipe)};
+  \node[module, right=0.35cm of mediapipe, fill=white!95!purple] (geometry) {几何计算\\(NumPy)};
+  \node[module, right=0.35cm of geometry, fill=white!95!purple] (rule) {规则评估\\(JSON标准库)};
+
+  \draw[annot] (-6,-4.9) -- (6,-4.9)
+    node[midway, above=0.1cm, annot] {SQL 持久化 / HTTPS API 调用};
+
+  \node[layer, fill=white!92!red, draw=black!40, below=0.8cm of algorithm] (persistence) {模型与数据持久化层};
+  \node[module, below=0.35cm of persistence, xshift=-2cm, fill=white!95!red] (sqlite) {SQLite\\(用户/评估/日志)};
+  \node[module, right=0.5cm of sqlite, fill=white!95!red] (qwen) {千问API\\(多模态模型)};
+
+  \node[font=\sffamily\zihao{7}, rotate=90, left=0.5cm of frontend, yshift=-0.5cm, fill=white, inner sep=2pt] {交互层};
+  \node[font=\sffamily\zihao{7}, rotate=90, left=0.5cm of backend, yshift=-0.5cm, fill=white, inner sep=2pt] {调度层};
+  \node[font=\sffamily\zihao{7}, rotate=90, left=0.5cm of algorithm, yshift=-0.5cm, fill=white, inner sep=2pt] {计算层};
+  \node[font=\sffamily\zihao{7}, rotate=90, left=0.5cm of persistence, yshift=-0.5cm, fill=white, inner sep=2pt] {存储层};
+\end{tikzpicture}%
+}%
+}
+
+\newcommand{\YogaDatabaseERTikZ}{%
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=2.2cm,
+  entity/.style={rectangle, draw, rounded corners, minimum width=3.2cm, minimum height=2.5cm,
+                 fill=blue!8, font=\sffamily\zihao{6}, align=left, inner sep=5pt},
+  line/.style={thick},
+  crow1/.style={thick, -{Stealth[length=3mm, width=2mm]}},
+  crown/.style={thick, {Stealth[length=3mm, width=2mm]}-{Stealth[length=3mm, width=2mm]}}
+]
+  \node[entity] (user) {
+    \textbf{user (用户表)}\\[0.2cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.05cm]
+    username: TEXT (UNIQUE)\\[0.05cm]
+    password\_hash: TEXT\\[0.05cm]
+    email: TEXT (UNIQUE)\\[0.05cm]
+    role: TEXT (CHECK)\\[0.05cm]
+    is\_active: INTEGER\\[0.05cm]
+    created\_at: TIMESTAMP
+  };
+
+  \node[entity, right=3.5cm of user] (assessment) {
+    \textbf{assessment\_record}\\[0.2cm]
+    \textbf{(评估记录表)}\\[0.1cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.05cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.05cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} task\_id: TEXT\\[0.05cm]
+    pose\_type: TEXT\\[0.05cm]
+    overall\_score: REAL\\[0.05cm]
+    angle\_data: TEXT(JSON)\\[0.05cm]
+    created\_at: TIMESTAMP
+  };
+
+  \node[entity, below=1.8cm of assessment] (video) {
+    \textbf{video\_data (视频表)}\\[0.2cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.05cm]
+    task\_id: TEXT (UNIQUE)\\[0.05cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.05cm]
+    file\_path: TEXT\\[0.05cm]
+    file\_size: INTEGER\\[0.05cm]
+    status: TEXT\\[0.05cm]
+    error\_message: TEXT\\[0.05cm]
+    created\_at: TIMESTAMP
+  };
+
+  \node[entity, below=1.8cm of user] (progress) {
+    \textbf{user\_progress}\\[0.2cm]
+    \textbf{(用户进度表)}\\[0.1cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.05cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.05cm]
+    pose\_type: TEXT\\[0.05cm]
+    total\_sessions: INTEGER\\[0.05cm]
+    avg\_score: REAL\\[0.05cm]
+    last\_practiced\_at: TIMESTAMP
+  };
+
+  \node[entity, below=2.2cm of progress, xshift=-2.4cm] (log) {
+    \textbf{system\_log (系统日志)}\\[0.2cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.05cm]
+    level: TEXT\\[0.05cm]
+    module: TEXT\\[0.05cm]
+    message: TEXT\\[0.05cm]
+    traceback: TEXT\\[0.05cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.05cm]
+    created\_at: TIMESTAMP
+  };
+
+  \draw[crow1] (user.east) -- node[above, font=\zihao{7}] {1}
+    ++(0.6,0) -- node[above, font=\zihao{7}] {N} ++(0.6,0) -- (assessment.west);
+  \draw[crow1] (user.south) |- ++(0.5,-0.8) -|
+    node[pos=0.25, above, font=\zihao{7}] {1}
+    node[pos=0.75, above, font=\zihao{7}] {N} (video.north);
+  \draw[crow1] (user.south) -- node[right, font=\zihao{7}] {1:N} (progress.north);
+  \draw[crown] (assessment.south) -- node[right, font=\zihao{7}] {1:1} (video.north);
+  \draw[crow1] (progress.south) -- ++(0,-0.5) -| (log.north)
+    node[pos=0.25, left, font=\zihao{7}] {1:N};
+  \draw[crow1, loosely dotted, gray] (user.south west) .. controls +(-0.6,-0.9) and +(0,0.5) .. (log.west)
+    node[pos=0.4, left, font=\zihao{7}, text=gray] {1:N};
+\end{tikzpicture}%
+}%
+}
+
+
+\newcommand{\YogaRegisterSequenceTikZ}{%
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=4pt}
+]
+  \node[font=\sffamily\bfseries\zihao{5}] (user) at (0,0) {用户};
+  \node[font=\sffamily\bfseries\zihao{5}] (frontend) at (3.5,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] (backend) at (7.5,0) {后端};
+  \node[font=\sffamily\bfseries\zihao{5}] (db) at (11.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-8);
+  \draw[lifeline] (3.5,-0.5) -- (3.5,-8);
+  \draw[lifeline] (7.5,-0.5) -- (7.5,-8);
+  \draw[lifeline] (11.5,-0.5) -- (11.5,-8);
+
+  \draw[msg] (0,-1) -- (3.5,-1) node[midway, above, font=\zihao{6}] {1. 填写注册表单};
+  \draw[msg] (3.5,-1.8) -- (7.5,-1.8) node[midway, above, font=\zihao{6}] {2. POST /api/register};
+  \node[box] at (7.5,-2.3) {username, email,\\password};
+  \draw[msg] (7.5,-3) -- (11.5,-3) node[midway, above, font=\zihao{6}] {3. SELECT 查重};
+  \draw[rmsg] (11.5,-3.8) -- (7.5,-3.8) node[midway, above, font=\zihao{6}] {4. 返回查询结果};
+  \draw[self] (7.5,-4.3) -- (8.3,-4.3) node[right, font=\zihao{6}] {5. bcrypt.hash(12)};
+  \draw[msg] (7.5,-5.2) -- (11.5,-5.2) node[midway, above, font=\zihao{6}] {6. INSERT 新用户};
+  \node[box] at (11.5,-5.7) {password\_hash\\存入};
+  \draw[rmsg] (11.5,-6.5) -- (7.5,-6.5) node[midway, above, font=\zihao{6}] {7. 插入成功};
+  \draw[rmsg] (7.5,-7.3) -- (3.5,-7.3) node[midway, above, font=\zihao{6}] {8. 201 Created};
+  \draw[rmsg] (3.5,-8) -- (0,-8) node[midway, above, font=\zihao{6}] {9. 跳转登录页};
+  \draw[fill=gray!10, draw=none] (7.2,-2.5) rectangle (7.8,-5.5);
+\end{tikzpicture}%
+}%
+}
+
+\newcommand{\YogaLoginSequenceTikZ}{%
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=4pt}
+]
+  \node[font=\sffamily\bfseries\zihao{5}] (user) at (0,0) {用户};
+  \node[font=\sffamily\bfseries\zihao{5}] (frontend) at (3.5,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] (backend) at (7.5,0) {后端};
+  \node[font=\sffamily\bfseries\zihao{5}] (db) at (11.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-9);
+  \draw[lifeline] (3.5,-0.5) -- (3.5,-9);
+  \draw[lifeline] (7.5,-0.5) -- (7.5,-9);
+  \draw[lifeline] (11.5,-0.5) -- (11.5,-9);
+
+  \draw[msg] (0,-1) -- (3.5,-1) node[midway, above, font=\zihao{6}] {1. 输入用户名/密码};
+  \draw[msg] (3.5,-1.8) -- (7.5,-1.8) node[midway, above, font=\zihao{6}] {2. POST /api/login};
+  \draw[msg] (7.5,-2.6) -- (11.5,-2.6) node[midway, above, font=\zihao{6}] {3. SELECT 查询用户};
+  \draw[rmsg] (11.5,-3.4) -- (7.5,-3.4) node[midway, above, font=\zihao{6}] {4. 返回 password\_hash};
+  \draw[self] (7.5,-4) -- (8.3,-4) node[right, font=\zihao{6}] {5. bcrypt.compare()};
+  \draw[self] (7.5,-4.8) -- (8.3,-4.8) node[right, font=\zihao{6}] {6. JWT 签名};
+  \node[box] at (8.5,-5.2) {payload: user\_id,\\role, exp};
+  \draw[rmsg] (7.5,-6) -- (3.5,-6) node[midway, above, font=\zihao{6}] {7. 返回 token};
+  \node[box] at (5.5,-6.5) {token存入\\localStorage};
+  \draw[rmsg] (3.5,-7.3) -- (0,-7.3) node[midway, above, font=\zihao{6}] {8. 跳转控制台};
+  \draw[msg] (3.5,-8.2) -- (7.5,-8.2) node[midway, above, font=\zihao{6}] {9. 后续请求携带 Authorization};
+  \node[box] at (5.5,-8.7) {Bearer <token>};
+  \draw[fill=gray!10, draw=none] (7.2,-2.2) rectangle (7.8,-5.8);
+\end{tikzpicture}%
+}%
+}
+
+\newcommand{\YogaAssessmentSequenceTikZ}{%
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  async/.style={->, >=Stealth, thick, red!70!black},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{6}, align=center, inner sep=3pt}
+]
+  \node[font=\sffamily\bfseries\zihao{5}] (user) at (0,0) {用户};
+  \node[font=\sffamily\bfseries\zihao{5}] (frontend) at (3,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] (backend) at (6.5,0) {Flask主线程};
+  \node[font=\sffamily\bfseries\zihao{5}] (worker) at (10,0) {Worker线程};
+  \node[font=\sffamily\bfseries\zihao{5}] (db) at (13.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-12);
+  \draw[lifeline] (3,-0.5) -- (3,-12);
+  \draw[lifeline] (6.5,-0.5) -- (6.5,-12);
+  \draw[lifeline] (10,-0.5) -- (10,-12);
+  \draw[lifeline] (13.5,-0.5) -- (13.5,-12);
+
+  \draw[msg] (0,-1) -- (3,-1) node[midway, above, font=\zihao{6}] {1. 选择视频};
+  \draw[msg] (3,-1.8) -- (6.5,-1.8) node[midway, above, font=\zihao{6}] {2. POST /upload};
+  \draw[msg] (6.5,-2.6) -- (13.5,-2.6) node[midway, above, font=\zihao{6}] {3. INSERT video\_data (processing)};
+  \draw[async] (6.5,-3.4) -- (10,-3.4) node[midway, above, font=\zihao{6}] {4. 启动后台线程};
+  \node[box] at (8.25,-3.8) {TaskManager.add(task\_id)};
+  \draw[rmsg] (6.5,-4.6) -- (3,-4.6) node[midway, above, font=\zihao{6}] {5. 202 Accepted \{task\_id\}};
+  \draw[rmsg] (3,-5.4) -- (0,-5.4) node[midway, above, font=\zihao{6}] {6. 显示``处理中''};
+
+  \draw[self] (10,-6.2) -- (11,-6.2) node[right, font=\zihao{6}] {7. 帧提取};
+  \draw[msg] (10,-6.8) -- (13.5,-6.8) node[midway, above, font=\zihao{6}] {8. UPDATE status='extracting'};
+  \draw[self] (10,-7.6) -- (11,-7.6) node[right, font=\zihao{6}] {9. MediaPipe推理};
+  \draw[self] (10,-8.4) -- (11,-8.4) node[right, font=\zihao{6}] {10. 规则评估};
+  \draw[self] (10,-9.2) -- (11,-9.2) node[right, font=\zihao{6}] {11. 千问API调用};
+  \draw[msg] (10,-10) -- (13.5,-10) node[midway, above, font=\zihao{6}] {12. INSERT assessment\_record};
+
+  \node[box, fill=blue!10] at (3,-6.8) {每3秒轮询};
+  \draw[msg] (3,-7.6) -- (6.5,-7.6) node[midway, above, font=\zihao{6}] {GET /task/\{id\}};
+  \draw[msg] (6.5,-8.4) -- (13.5,-8.4) node[midway, above, font=\zihao{6}] {SELECT status};
+  \draw[rmsg] (13.5,-9.2) -- (6.5,-9.2) node[midway, above, font=\zihao{6}] {processing};
+  \draw[rmsg] (6.5,-10) -- (3,-10) node[midway, above, font=\zihao{6}] {processing};
+  \draw[rmsg] (13.5,-11) -- (6.5,-11) node[midway, above, font=\zihao{6}] {completed + 结果};
+  \draw[rmsg] (6.5,-11.5) -- (3,-11.5) node[midway, above, font=\zihao{6}] {200 OK \{result\}};
+  \draw[rmsg] (3,-12) -- (0,-12) node[midway, above, font=\zihao{6}] {13. 渲染评估报告};
+  \draw[fill=gray!10, draw=none] (9.7,-6) rectangle (10.3,-9.5);
+  \draw[fill=blue!5, draw=none] (2.7,-6.5) rectangle (3.3,-10.5);
+\end{tikzpicture}%
+}%
+}
+
+\newcommand{\YogaAdminSequenceTikZ}{%
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=4pt},
+  forbid/.style={red!70!black, thick, -{Stealth[length=3mm]}}
+]
+  \node[font=\sffamily\bfseries\zihao{5}] (admin) at (0,0) {管理员};
+  \node[font=\sffamily\bfseries\zihao{5}] (frontend) at (3.5,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] (backend) at (7.5,0) {后端(拦截器)};
+  \node[font=\sffamily\bfseries\zihao{5}] (db) at (11.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-12.8);
+  \draw[lifeline] (3.5,-0.5) -- (3.5,-12.8);
+  \draw[lifeline] (7.5,-0.5) -- (7.5,-12.8);
+  \draw[lifeline] (11.5,-0.5) -- (11.5,-12.8);
+
+  \draw[msg] (0,-1) -- (3.5,-1) node[midway, above, font=\zihao{6}] {1. 进入管理面板};
+  \draw[msg] (3.5,-1.8) -- (7.5,-1.8) node[midway, above, font=\zihao{6}] {2. GET /admin/users};
+  \node[box] at (5.5,-2.2) {Authorization:\\Bearer <admin\_token>};
+  \draw[self] (7.5,-2.8) -- (8.3,-2.8) node[right, font=\zihao{6}] {3. JWT 解析};
+  \draw[self] (7.5,-3.5) -- (8.3,-3.5) node[right, font=\zihao{6}] {4. 验证 role='admin'};
+  \draw[msg] (7.5,-4.3) -- (11.5,-4.3) node[midway, above, font=\zihao{6}] {5. SELECT 用户列表};
+  \draw[rmsg] (11.5,-5.1) -- (7.5,-5.1) node[midway, above, font=\zihao{6}] {6. 返回数据};
+  \draw[rmsg] (7.5,-5.9) -- (3.5,-5.9) node[midway, above, font=\zihao{6}] {7. 200 OK \{users\}};
+  \draw[rmsg] (3.5,-6.7) -- (0,-6.7) node[midway, above, font=\zihao{6}] {8. 渲染用户管理界面};
+  \draw[msg] (0,-7.5) -- (3.5,-7.5) node[midway, above, font=\zihao{6}] {9. 修改用户状态};
+  \draw[msg] (3.5,-8.3) -- (7.5,-8.3) node[midway, above, font=\zihao{6}] {10. PUT /admin/user/123};
+  \draw[msg] (7.5,-9) -- (11.5,-9) node[midway, above, font=\zihao{6}] {11. UPDATE user SET...};
+
+  \node[font=\sffamily\bfseries\zihao{6}, red!70!black] at (1.75,-10.5) {越权尝试场景};
+  \draw[forbid] (3.5,-11) -- (7.5,-11) node[midway, above, font=\zihao{6}] {12. 普通用户 token 访问 /admin};
+  \node[box, fill=red!10] at (7.5,-11.8) {role='user'\\拒绝访问};
+  \draw[rmsg, red!70!black] (7.5,-12.5) -- (3.5,-12.5) node[midway, above, font=\zihao{6}] {13. 403 Forbidden};
+\end{tikzpicture}%
+}%
+}
+
+% secnumdepth=3：编号到 subsection
+% tocdepth=3：目录显示到 subsection
+% 后三句：强制编号格式改成阿拉伯数字层级形式
+\renewcommand{\YogaSystemArchitectureTikZ}{%
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+  layer/.style={rectangle, draw, rounded corners=4pt, minimum width=12.8cm, minimum height=0.72cm, font=\sffamily\bfseries\zihao{5}, align=center},
+  module/.style={rectangle, draw, rounded corners=3pt, minimum width=2.55cm, minimum height=0.66cm, font=\sffamily\zihao{6}, align=center},
+  arrow/.style={->, >=Stealth, thick},
+  sep/.style={<->, thick, dashed},
+  sidelabel/.style={font=\sffamily\zihao{7}, rotate=90}
+]
+  \node[font=\sffamily\zihao{6}] (user) at (-4.3,0.85) {普通用户(学员)};
+  \node[font=\sffamily\zihao{6}] (admin) at (4.3,0.85) {管理员};
+
+  \node[layer, fill=cyan!20] (frontend) at (0,0) {前端展示层 (HTML5 + CSS3 + 原生 JavaScript)};
+  \node[module, fill=cyan!10] (ui) at (-4.8,-0.9) {UI组件库};
+  \node[module, fill=cyan!10] (polling) at (-1.6,-0.9) {长轮询管理器};
+  \node[module, fill=cyan!10] (upload) at (1.6,-0.9) {分块上传组件};
+  \node[module, fill=cyan!10] (chart) at (4.8,-0.9) {可视化渲染};
+  \draw[arrow] (user.south) -- ++(0,-0.25) -| (frontend.north-|user);
+  \draw[arrow] (admin.south) -- ++(0,-0.25) -| (frontend.north-|admin);
+  \draw[sep] (-6.3,-1.48) -- (6.3,-1.48)
+    node[midway, above=0.05cm, fill=white, font=\sffamily\zihao{6}, inner sep=1pt] {HTTP/JSON + JWT 鉴权};
+
+  \node[layer, fill=orange!20] (backend) at (0,-2.08) {后端服务层 (Flask + Python threading)};
+  \node[module, fill=orange!10] (router) at (-4.8,-2.98) {路由分发};
+  \node[module, fill=orange!10] (auth) at (-1.6,-2.98) {JWT鉴权拦截};
+  \node[module, fill=orange!10] (taskmgr) at (1.6,-2.98) {任务管理器};
+  \node[module, fill=orange!10] (cors) at (4.8,-2.98) {CORS跨域};
+  \draw[sep, dash dot dot] (-6.3,-3.55) -- (6.3,-3.55)
+    node[midway, above=0.05cm, fill=white, font=\sffamily\zihao{6}, inner sep=1pt] {threading 后台线程 + 任务状态字典};
+
+  \node[layer, fill=purple!18] (algorithm) at (0,-4.15) {核心算法分析层 (Worker 守护线程)};
+  \node[module, fill=purple!10] (opencv) at (-4.8,-5.05) {视频解码\\(OpenCV)};
+  \node[module, fill=purple!10] (mediapipe) at (-1.6,-5.05) {姿态估计\\(MediaPipe)};
+  \node[module, fill=purple!10] (geometry) at (1.6,-5.05) {几何计算\\(NumPy)};
+  \node[module, fill=purple!10] (rule) at (4.8,-5.05) {规则评估\\(JSON标准库)};
+  \draw[sep, dotted] (-6.3,-6.08) -- (6.3,-6.08)
+    node[midway, above=0.03cm, fill=white, font=\sffamily\zihao{7}, inner sep=1pt, align=center] {SQL 持久化\\HTTPS API 调用};
+
+  \node[layer, fill=red!18] (persistence) at (0,-6.72) {模型与数据持久化层};
+  \node[module, fill=red!10] (sqlite) at (-2.0,-7.62) {SQLite\\(用户/评估/日志)};
+  \node[module, fill=red!10] (qwen) at (2.0,-7.62) {千问API\\(多模态模型)};
+
+  \node[sidelabel] at (-7.05,-0.45) {交互层};
+  \node[sidelabel] at (-7.05,-2.55) {调度层};
+  \node[sidelabel] at (-7.05,-4.62) {计算层};
+  \node[sidelabel] at (-7.05,-7.18) {存储层};
+\end{tikzpicture}%
+}%
+}
+
+\renewcommand{\YogaDatabaseERTikZ}{%
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[
+  entity/.style={rectangle, draw, rounded corners=4pt, text width=3.55cm, minimum height=2.65cm,
+                 fill=blue!8, font=\sffamily\zihao{6}, align=left, inner sep=5pt},
+  rel/.style={thick, -{Stealth[length=2.4mm, width=1.8mm]}},
+  relboth/.style={thick, {Stealth[length=2.4mm, width=1.8mm]}-{Stealth[length=2.4mm, width=1.8mm]}},
+  note/.style={font=\zihao{7}, fill=white, inner sep=1pt}
+]
+  \node[entity] (user) at (-4.5,0) {
+    \textbf{user (用户表)}\\[0.18cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.04cm]
+    username: TEXT (UNIQUE)\\[0.04cm]
+    password\_hash: TEXT\\[0.04cm]
+    email: TEXT (UNIQUE)\\[0.04cm]
+    role: TEXT (CHECK)\\[0.04cm]
+    is\_active: INTEGER\\[0.04cm]
+    created\_at: TIMESTAMP
+  };
+
+  \node[entity] (assessment) at (4.1,0) {
+    \textbf{assessment\_record}\\[0.16cm]
+    \textbf{(评估记录表)}\\[0.08cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.04cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.04cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} task\_id: TEXT\\[0.04cm]
+    pose\_type: TEXT\\[0.04cm]
+    overall\_score: REAL\\[0.04cm]
+    angle\_data: TEXT(JSON)\\[0.04cm]
+    created\_at: TIMESTAMP
+  };
+
+  \node[entity] (progress) at (-4.5,-3.55) {
+    \textbf{user\_progress}\\[0.16cm]
+    \textbf{(用户进度表)}\\[0.08cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.04cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.04cm]
+    pose\_type: TEXT\\[0.04cm]
+    total\_sessions: INTEGER\\[0.04cm]
+    avg\_score: REAL\\[0.04cm]
+    last\_practiced\_at: TIMESTAMP
+  };
+
+  \node[entity] (video) at (4.1,-3.55) {
+    \textbf{video\_data (视频表)}\\[0.18cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.04cm]
+    task\_id: TEXT (UNIQUE)\\[0.04cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.04cm]
+    file\_path: TEXT\\[0.04cm]
+    file\_size: INTEGER\\[0.04cm]
+    status: TEXT\\[0.04cm]
+    error\_message: TEXT\\[0.04cm]
+    created\_at: TIMESTAMP
+  };
+
+  \node[entity] (log) at (-5.3,-7.0) {
+    \textbf{system\_log (系统日志)}\\[0.18cm]
+    {\color{red!80!black}\ttfamily\zihao{6}PK} id: INTEGER\\[0.04cm]
+    level: TEXT\\[0.04cm]
+    module: TEXT\\[0.04cm]
+    message: TEXT\\[0.04cm]
+    traceback: TEXT\\[0.04cm]
+    {\color{blue!80!black}\ttfamily\zihao{6}FK} user\_id: INTEGER\\[0.04cm]
+    created\_at: TIMESTAMP
+  };
+
+  \draw[rel] (user.east) -- node[above, note] {1:N} (assessment.west);
+  \draw[rel] (user.south) -- node[right, note] {1:N} (progress.north);
+  \draw[rel] (user.east) -- ++(0.9,0) |- node[pos=0.72, above, note] {1:N} (video.west);
+  \draw[relboth] (assessment.south) -- node[right, note] {1:1} (video.north);
+  \draw[rel, loosely dotted, gray] (user.west) -- ++(-1.2,0) |- node[pos=0.25, left, note, text=gray] {1:N} (log.west);
+\end{tikzpicture}%
+}%
+}
+
+\renewcommand{\YogaRegisterSequenceTikZ}{%
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=4pt},
+  note/.style={font=\zihao{7}, fill=white, inner sep=1pt}
+]
+  \fill[gray!10] (7.2,-2.45) rectangle (7.8,-5.55);
+  \node[font=\sffamily\bfseries\zihao{5}] at (0,0) {用户};
+  \node[font=\sffamily\bfseries\zihao{5}] at (3.5,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] at (7.5,0) {后端};
+  \node[font=\sffamily\bfseries\zihao{5}] at (11.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-8.05);
+  \draw[lifeline] (3.5,-0.5) -- (3.5,-8.05);
+  \draw[lifeline] (7.5,-0.5) -- (7.5,-8.05);
+  \draw[lifeline] (11.5,-0.5) -- (11.5,-8.05);
+
+  \draw[msg] (0,-1) -- (3.5,-1) node[midway, above, note] {1. 填写注册表单};
+  \draw[msg] (3.5,-1.8) -- (7.5,-1.8) node[midway, above, note] {2. POST /api/register};
+  \node[box] at (7.5,-2.32) {username, email,\\password};
+  \draw[msg] (7.5,-3.05) -- (11.5,-3.05) node[midway, above, note] {3. SELECT 查重};
+  \draw[rmsg] (11.5,-3.85) -- (7.5,-3.85) node[midway, above, note] {4. 返回查询结果};
+  \draw[self] (7.5,-4.35) -- (8.35,-4.35) node[right, note] {5. bcrypt.hash(12)};
+  \draw[msg] (7.5,-5.25) -- (11.5,-5.25) node[midway, above, note] {6. INSERT 新用户};
+  \node[box] at (11.5,-5.78) {password\_hash\\存入};
+  \draw[rmsg] (11.5,-6.55) -- (7.5,-6.55) node[midway, above, note] {7. 插入成功};
+  \draw[rmsg] (7.5,-7.35) -- (3.5,-7.35) node[midway, above, note] {8. 201 Created};
+  \draw[rmsg] (3.5,-8.05) -- (0,-8.05) node[midway, above, note] {9. 跳转登录页};
+\end{tikzpicture}%
+}%
+}
+
+\renewcommand{\YogaLoginSequenceTikZ}{%
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=4pt},
+  note/.style={font=\zihao{7}, fill=white, inner sep=1pt}
+]
+  \fill[gray!10] (7.2,-2.2) rectangle (7.8,-5.75);
+  \node[font=\sffamily\bfseries\zihao{5}] at (0,0) {用户};
+  \node[font=\sffamily\bfseries\zihao{5}] at (3.5,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] at (7.5,0) {后端};
+  \node[font=\sffamily\bfseries\zihao{5}] at (11.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-9);
+  \draw[lifeline] (3.5,-0.5) -- (3.5,-9);
+  \draw[lifeline] (7.5,-0.5) -- (7.5,-9);
+  \draw[lifeline] (11.5,-0.5) -- (11.5,-9);
+
+  \draw[msg] (0,-1) -- (3.5,-1) node[midway, above, note] {1. 输入用户名/密码};
+  \draw[msg] (3.5,-1.8) -- (7.5,-1.8) node[midway, above, note] {2. POST /api/login};
+  \draw[msg] (7.5,-2.6) -- (11.5,-2.6) node[midway, above, note] {3. SELECT 查询用户};
+  \draw[rmsg] (11.5,-3.4) -- (7.5,-3.4) node[midway, above, note] {4. 返回 password\_hash};
+  \draw[self] (7.5,-4.05) -- (8.4,-4.05) node[right, note] {5. bcrypt.compare()};
+  \draw[self] (7.5,-4.75) -- (8.4,-4.75) node[right, note] {6. JWT 签名};
+  \node[box] at (9.35,-5.35) {payload: user\_id,\\role, exp};
+  \draw[rmsg] (7.5,-6.15) -- (3.5,-6.15) node[midway, above, note] {7. 返回 token};
+  \node[box] at (5.5,-6.68) {token存入\\localStorage};
+  \draw[rmsg] (3.5,-7.45) -- (0,-7.45) node[midway, above, note] {8. 跳转控制台};
+  \draw[msg] (3.5,-8.25) -- (7.5,-8.25) node[midway, above, note] {9. 后续请求携带 Authorization};
+  \node[box] at (5.5,-8.78) {Bearer <token>};
+\end{tikzpicture}%
+}%
+}
+
+\renewcommand{\YogaAssessmentSequenceTikZ}{%
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  async/.style={->, >=Stealth, thick, red!70!black},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=3pt},
+  note/.style={font=\zihao{7}, fill=white, inner sep=1pt}
+]
+  \fill[gray!10] (10.25,-5.95) rectangle (10.75,-10.35);
+  \fill[blue!6] (2.75,-6.58) rectangle (3.25,-10.55);
+
+  \node[font=\sffamily\bfseries\zihao{5}] at (0,0) {用户};
+  \node[font=\sffamily\bfseries\zihao{5}] at (3,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] at (6.7,0) {Flask 主线程};
+  \node[font=\sffamily\bfseries\zihao{5}] at (10.5,0) {Worker 线程};
+  \node[font=\sffamily\bfseries\zihao{5}] at (14.2,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-13.05);
+  \draw[lifeline] (3,-0.5) -- (3,-13.05);
+  \draw[lifeline] (6.7,-0.5) -- (6.7,-13.05);
+  \draw[lifeline] (10.5,-0.5) -- (10.5,-13.05);
+  \draw[lifeline] (14.2,-0.5) -- (14.2,-13.05);
+
+  \draw[msg] (0,-1) -- (3,-1) node[midway, above, note] {1. 选择视频};
+  \draw[msg] (3,-1.8) -- (6.7,-1.8) node[midway, above, note] {2. POST /upload};
+  \draw[msg] (6.7,-2.6) -- (14.2,-2.6) node[midway, above, note] {3. INSERT video\_data (processing)};
+  \draw[async] (6.7,-3.4) -- (10.5,-3.4) node[midway, above, note, text=red!70!black] {4. 启动后台线程};
+  \node[box] at (8.6,-3.88) {TaskManager.add(task\_id)};
+  \draw[rmsg] (6.7,-4.75) -- (3,-4.75) node[midway, above, note] {5. 202 Accepted \{task\_id\}};
+  \draw[rmsg] (3,-5.45) -- (0,-5.45) node[midway, above, note] {6. 显示``处理中''};
+
+  \node[box, fill=blue!10] at (3,-6.72) {每3秒轮询};
+  \draw[self] (10.5,-6.35) -- (11.45,-6.35) node[right, note] {7. 帧提取};
+  \draw[msg] (10.5,-7.12) -- (14.2,-7.12) node[midway, above, note] {8. UPDATE status='extracting'};
+  \draw[msg] (3,-7.72) -- (6.7,-7.72) node[midway, above, note] {GET /task/\{id\}};
+  \draw[self] (10.5,-8.15) -- (11.45,-8.15) node[right, note] {9. MediaPipe 推理};
+  \draw[msg] (6.7,-8.75) -- (14.2,-8.75) node[midway, above, note] {SELECT status};
+  \draw[self] (10.5,-9.45) -- (11.45,-9.45) node[right, note] {10. 规则评估};
+  \draw[rmsg] (14.2,-10.12) -- (6.7,-10.12) node[midway, above, note] {processing};
+  \draw[self] (10.5,-10.85) -- (11.45,-10.85) node[right, note] {11. 千问 API 调用};
+  \draw[rmsg] (6.7,-11.42) -- (3,-11.42) node[midway, above, note] {processing};
+  \draw[msg] (10.5,-12.05) -- (14.2,-12.05) node[midway, above, note] {12. INSERT assessment\_record};
+  \draw[rmsg] (14.2,-12.72) -- (6.7,-12.72) node[midway, above, note] {completed + 结果};
+  \draw[rmsg] (6.7,-13.35) -- (3,-13.35) node[midway, above, note] {200 OK \{result\}};
+  \draw[rmsg] (3,-13.95) -- (0,-13.95) node[midway, above, note] {13. 渲染评估报告};
+\end{tikzpicture}%
+}%
+}
+
+\renewcommand{\YogaAdminSequenceTikZ}{%
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[
+  lifeline/.style={thick, draw=gray},
+  msg/.style={->, >=Stealth, thick},
+  rmsg/.style={<-, >=Stealth, thick, dashed},
+  self/.style={->, >=Stealth, thick},
+  box/.style={rectangle, draw, fill=white, font=\ttfamily\zihao{7}, align=center, inner sep=4pt},
+  forbid/.style={red!70!black, thick, -{Stealth[length=3mm]}},
+  note/.style={font=\zihao{7}, fill=white, inner sep=1pt}
+]
+  \node[font=\sffamily\bfseries\zihao{5}] at (0,0) {管理员};
+  \node[font=\sffamily\bfseries\zihao{5}] at (3.5,0) {前端};
+  \node[font=\sffamily\bfseries\zihao{5}] at (7.5,0) {后端(拦截器)};
+  \node[font=\sffamily\bfseries\zihao{5}] at (11.5,0) {数据库};
+
+  \draw[lifeline] (0,-0.5) -- (0,-12.8);
+  \draw[lifeline] (3.5,-0.5) -- (3.5,-12.8);
+  \draw[lifeline] (7.5,-0.5) -- (7.5,-12.8);
+  \draw[lifeline] (11.5,-0.5) -- (11.5,-12.8);
+
+  \draw[msg] (0,-1) -- (3.5,-1) node[midway, above, note] {1. 进入管理面板};
+  \draw[msg] (3.5,-1.8) -- (7.5,-1.8) node[midway, above, note] {2. GET /admin/users};
+  \node[box] at (5.5,-2.28) {Authorization:\\Bearer <admin\_token>};
+  \draw[self] (7.5,-2.95) -- (8.35,-2.95) node[right, note] {3. JWT 解析};
+  \draw[self] (7.5,-3.65) -- (8.35,-3.65) node[right, note] {4. 验证 role='admin'};
+  \draw[msg] (7.5,-4.45) -- (11.5,-4.45) node[midway, above, note] {5. SELECT 用户列表};
+  \draw[rmsg] (11.5,-5.2) -- (7.5,-5.2) node[midway, above, note] {6. 返回数据};
+  \draw[rmsg] (7.5,-5.95) -- (3.5,-5.95) node[midway, above, note] {7. 200 OK \{users\}};
+  \draw[rmsg] (3.5,-6.72) -- (0,-6.72) node[midway, above, note] {8. 渲染用户管理界面};
+  \draw[msg] (0,-7.55) -- (3.5,-7.55) node[midway, above, note] {9. 修改用户状态};
+  \draw[msg] (3.5,-8.35) -- (7.5,-8.35) node[midway, above, note] {10. PUT /admin/user/123};
+  \draw[msg] (7.5,-9.05) -- (11.5,-9.05) node[midway, above, note] {11. UPDATE user SET...};
+
+  \node[font=\sffamily\bfseries\zihao{6}, red!70!black] at (1.75,-10.45) {越权尝试场景};
+  \draw[forbid] (3.5,-11) -- (7.5,-11) node[midway, above, note, text=red!70!black] {12. 普通用户 token 访问 /admin};
+  \node[box, fill=red!10] at (7.5,-11.78) {role='user'\\拒绝访问};
+  \draw[rmsg, red!70!black] (7.5,-12.55) -- (3.5,-12.55) node[midway, above, note, text=red!70!black] {13. 403 Forbidden};
+\end{tikzpicture}%
+}%
+}
+
+\renewcommand{\YogaDatabaseERTikZ}{%
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[
+  entity/.style={rectangle, rounded corners=5pt, draw=blue!45!black, line width=0.8pt,
+                 fill=blue!8, text width=4.25cm, align=left, inner sep=7pt},
+  rel/.style={draw=black!65, line width=0.9pt, rounded corners=5pt},
+  note/.style={font=\sffamily\zihao{7}, fill=white, inner sep=1.5pt, text=black!80}
+]
+  \node[entity] (user) at (0,0) {
+    {\sffamily\bfseries\zihao{6} user}\\[-1pt]
+    {\sffamily\bfseries\zihao{6}（用户表）}\\[4pt]
+    {\color{red!75!black}\ttfamily PK}\ \texttt{id: INTEGER}\\
+    \texttt{username: TEXT (UNIQUE)}\\
+    \texttt{password\_hash: TEXT}\\
+    \texttt{email: TEXT (UNIQUE)}\\
+    \texttt{role: TEXT (CHECK)}\\
+    \texttt{is\_active: INTEGER}\\
+    \texttt{created\_at: TIMESTAMP}
+  };
+
+  \node[entity] (assessment) at (6.2,0) {
+    {\sffamily\bfseries\zihao{6} assessment\_record}\\[-1pt]
+    {\sffamily\bfseries\zihao{6}（评估记录表）}\\[4pt]
+    {\color{red!75!black}\ttfamily PK}\ \texttt{id: INTEGER}\\
+    {\color{blue!70!black}\ttfamily FK}\ \texttt{user\_id: INTEGER}\\
+    {\color{blue!70!black}\ttfamily FK}\ \texttt{task\_id: TEXT}\\
+    \texttt{pose\_type: TEXT}\\
+    \texttt{overall\_score: REAL}\\
+    \texttt{angle\_data: TEXT(JSON)}\\
+    \texttt{created\_at: TIMESTAMP}
+  };
+
+  \node[entity] (progress) at (-6.2,-4.2) {
+    {\sffamily\bfseries\zihao{6} user\_progress}\\[-1pt]
+    {\sffamily\bfseries\zihao{6}（用户进度表）}\\[4pt]
+    {\color{red!75!black}\ttfamily PK}\ \texttt{id: INTEGER}\\
+    {\color{blue!70!black}\ttfamily FK}\ \texttt{user\_id: INTEGER}\\
+    \texttt{pose\_type: TEXT}\\
+    \texttt{total\_sessions: INTEGER}\\
+    \texttt{avg\_score: REAL}\\
+    \texttt{last\_practiced\_at: TIMESTAMP}
+  };
+
+  \node[entity] (video) at (6.2,-4.2) {
+    {\sffamily\bfseries\zihao{6} video\_data}\\[-1pt]
+    {\sffamily\bfseries\zihao{6}（视频表）}\\[4pt]
+    {\color{red!75!black}\ttfamily PK}\ \texttt{id: INTEGER}\\
+    \texttt{task\_id: TEXT (UNIQUE)}\\
+    {\color{blue!70!black}\ttfamily FK}\ \texttt{user\_id: INTEGER}\\
+    \texttt{file\_path: TEXT}\\
+    \texttt{file\_size: INTEGER}\\
+    \texttt{status: TEXT}\\
+    \texttt{error\_message: TEXT}\\
+    \texttt{created\_at: TIMESTAMP}
+  };
+
+  \node[entity] (log) at (0,-8.0) {
+    {\sffamily\bfseries\zihao{6} system\_log}\\[-1pt]
+    {\sffamily\bfseries\zihao{6}（系统日志）}\\[4pt]
+    {\color{red!75!black}\ttfamily PK}\ \texttt{id: INTEGER}\\
+    \texttt{level: TEXT}\\
+    \texttt{module: TEXT}\\
+    \texttt{message: TEXT}\\
+    \texttt{traceback: TEXT}\\
+    {\color{blue!70!black}\ttfamily FK}\ \texttt{user\_id: INTEGER}\\
+    \texttt{created\_at: TIMESTAMP}
+  };
+
+  \draw[rel] (user.east) -- node[above, note] {1:N} (assessment.west);
+  \draw[rel] (assessment.south) -- node[right, note] {1:1} (video.north);
+  \draw[rel] (user.south west) |- node[pos=0.28, above, note] {1:N} (progress.north east);
+  \draw[rel] (user.south east) |- node[pos=0.30, above, note] {1:N} (video.north west);
+  \draw[rel] (user.south) -- node[right, note] {1:N} (log.north);
+\end{tikzpicture}%
+}%
+}
+

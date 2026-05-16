@@ -36,6 +36,8 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+__MACOSX/
+._*
 
 # Project specific
 data/raw/*
@@ -54,14 +56,30 @@ data/temp/*
 
 # Output files
 output/
+outputs/
+reports/
+logs/
+uploads/
+miktex_local/
 *.log
 model_output.txt
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.toc
+*.synctex.gz
+*.synctex(busy)
+texput.log
 
 # Local databases and journals
 *.db
 *.db-journal
 *.sqlite
 *.sqlite3
+*.db.bak_*
+*.db-journal.bak_*
 
 # Rust build artifacts
 rust_backend/target/

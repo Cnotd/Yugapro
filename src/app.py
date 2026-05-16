@@ -16,7 +16,7 @@ from src.stats_calculator import StatsCalculator
 from src.prompt_builder import PromptBuilder
 from src.ollama_client import OllamaClient
 from src.result_parser import ResultParser
-from config.settings import POSE_STANDARDS
+from config.settings import POSE_STANDARDS, get_pose_standard
 
 
 class YogaAssessmentApp:
@@ -72,7 +72,7 @@ class YogaAssessmentApp:
             stability_score = self.stats_calculator.compute_stability(landmarks_seq)
             
             # 5. 构建提示词
-            pose_standard = POSE_STANDARDS.get(pose_name)
+            pose_standard = get_pose_standard(pose_name)
             prompt = self.prompt_builder.build(stats, stability_score, pose_name, pose_standard)
             
             # 6. 调用大模型评估

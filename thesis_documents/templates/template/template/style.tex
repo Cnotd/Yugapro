@@ -1,0 +1,248 @@
+% secnumdepth=2：编号到 subsection，即模板中的三级标题
+% tocdepth=2：目录显示到 subsection，即目录中显示三级标题
+% 后三句：强制编号格式改成阿拉伯数字层级形式
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+
+\renewcommand{\thechapter}{\arabic{chapter}}
+\renewcommand{\thesection}{\thechapter.\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+\ctexset{
+  chapter = {
+    name = {,},
+    number = \arabic{chapter}
+  }
+}
+
+% 使用 ctexset 对章节标题、页眉页脚等样式进行定制，以满足学校对字体和字号的要求。
+% 一级标题（章标题）使用黑体、小三号字号，并居中排版；二级标题使用黑体四号；
+% 三级标题使用黑体小四号；四级标题使用楷体小四号；五级标题使用宋体加粗小四号。
+\ctexset{
+  chapter={
+    format=\centering\heiti\zihao{-3},
+    nameformat=\heiti\zihao{-3},
+    beforeskip=0pt,
+    afterskip=12pt,
+  },
+  section={
+    format=\raggedright\setstretch{1.5}\heiti\zihao{4},
+    beforeskip=0pt,
+    afterskip=0pt,
+  },
+  subsection={
+    format=\raggedright\setstretch{1.5}\heiti\zihao{-4},
+    beforeskip=0pt,
+    afterskip=0pt,
+  },
+  subsubsection={
+    format=\raggedright\setstretch{1.5}\kaishu\zihao{-4},
+    beforeskip=0pt,
+    afterskip=0pt,
+  }
+}
+
+% 模板中的四级标题：编号为（1）、（2）、（3）……，楷体小四号，顶格。
+\newcounter{fourthsection}[subsection]
+\renewcommand{\thefourthsection}{（\arabic{fourthsection}）}
+\newcommand{\fourthsection}[1]{%
+  \refstepcounter{fourthsection}%
+  \par\noindent{\setstretch{1.5}\kaishu\zihao{-4}\thefourthsection#1\par}%
+  \nobreak
+}
+
+% 页面设置
+\geometry{
+  a4paper,
+  top=3cm,
+  bottom=4cm,
+  left=2.5cm,
+  right=2.5cm
+}
+
+% 页眉页脚位置
+\setlength{\headheight}{14pt}   % 页眉区域高度，给 fancyhdr 留够空间
+\setlength{\headsep}{2.01cm}    % 使页眉基线大致落在距顶边 1.5cm 附近
+\setlength{\footskip}{1.0cm}    % 使页脚基线大致落在距底边 1.5cm 附近
+
+% 页眉和页脚
+\pagestyle{fancy}
+\fancyhf{}
+
+% 页眉：宋体五号（10.5pt）
+\fancyhead[C]{\songti\zihao{5} 成都大学本科毕业设计（论文）}
+
+% 页脚：宋体小五（9pt）
+\fancyfoot[C]{\songti\zihao{-5}\thepage}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 章节首页也使用相同页眉页脚
+\makeatletter
+\def\ps@plain{\ps@fancy}
+\makeatother
+
+% 正文字体及行距设置
+\newcommand{\ThesisBodyFont}{%
+  \songti\zihao{-4}%
+  \linespread{1.25}\selectfont%
+}
+
+\newcommand{\ThesisBodyStyle}{%
+  \ThesisBodyFont
+  \setlength{\parindent}{2em}%
+  \setlength{\parskip}{0pt}%
+}
+
+\makeatletter
+\renewcommand{\normalsize}{\ThesisBodyFont}
+\makeatother
+
+\AtBeginDocument{%
+  \ThesisBodyStyle
+}
+
+% 调研列表：编号格式为“（1）”“（2）”。
+\newlist{researchlist}{enumerate}{1}
+\setlist[researchlist]{%
+  label=（\arabic*）,
+  ref=（\arabic*）,
+  labelindent=2em,
+  leftmargin=*,
+  labelsep=0.5em,
+  itemsep=0pt,
+  topsep=0pt,
+  parsep=0pt,
+  partopsep=0pt
+}
+
+\newcommand{\researchitem}[2]{%
+  \item #1%
+  \par\begingroup
+    \leftskip=-\leftmargin
+    \rightskip=0pt
+    \parindent=2em
+    \noindent\hspace*{2em}\ignorespaces#2\unskip\par
+  \endgroup
+}
+
+% 目录点线：数字越小，点越密。默认约为 4.5，这里调成接近 Word 模板的密度。
+\makeatletter
+\renewcommand{\@dotsep}{1}
+\renewcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    {\bfseries\@dottedtocline{0}{0em}{2.0em}{#1}{#2}}%
+    \penalty\@highpenalty
+  \fi
+}
+\makeatother
+
+% 图题、表题格式：居中，黑体，五号。
+\makeatletter
+\@ifpackageloaded{caption}{%
+  \DeclareCaptionFont{thesiscaptionfont}{\heiti\zihao{5}}
+  \captionsetup{
+    font=thesiscaptionfont,
+    labelfont=thesiscaptionfont,
+    textfont=thesiscaptionfont,
+    justification=centering,
+    singlelinecheck=true,
+    parindent=0pt
+  }
+  \captionsetup[figure]{position=bottom}
+  \captionsetup[table]{position=top}
+}{}
+\makeatother
+
+% 表内文字：中文宋体五号，数字和英文使用 Times New Roman。
+\AtBeginEnvironment{tabular}{\songti\zihao{5}\fontspec{Times New Roman}}
+
+% 算法块输入、输出标签。
+\makeatletter
+\@ifpackageloaded{algorithm}{\floatname{algorithm}{算法}}{}
+\@ifpackageloaded{algpseudocode}{%
+  \algrenewcommand\algorithmicrequire{\textbf{输入：}}
+  \algrenewcommand\algorithmicensure{\textbf{输出：}}
+}{}
+\makeatother
+
+% 浮动体内部不继承正文首行缩进，避免图片、表格和题名整体超出版心。
+\AtBeginEnvironment{figure}{\setlength{\parindent}{0pt}}
+\AtBeginEnvironment{table}{\setlength{\parindent}{0pt}}
+\AtBeginEnvironment{algorithm}{\setlength{\parindent}{0pt}}
+
+% 参考文献正文：宋体五号，1.25 倍行距。
+\AtBeginEnvironment{thebibliography}{%
+  \songti\zihao{5}%
+  \linespread{1.25}\selectfont%
+}
+
+\newcommand{\makeAbstractPersonalInfo}[4]{%
+  {%
+    \setstretch{1.25}\kaishu\zihao{-4}
+    \noindent\hspace*{\abstractPersonalInfoIndent}% 摘要处个人信息左边距
+    \begin{tabular}{@{}l@{\hspace{3em}}l@{}}
+      专业：#1 & 学号：\TNR{#2} \\[1.25em]
+      学生：#3 & 指导教师：#4 \\[1.25em]
+    \end{tabular}
+  }\\
+}
+
+\newcommand{\makeChineseAbstractHeader}[5]{%
+  \clearpage
+  \begin{center}
+    {\setstretch{1.5}\heiti\zihao{-2}#1\par}
+  \end{center}
+  \vspace{12pt}
+  %\addcontentsline{toc}{chapter}{摘要}
+  \makeAbstractPersonalInfo{#2}{#3}{#4}{#5}
+}
+
+\newcommand{\ChineseAbstractTextStart}{%
+  \noindent {\heiti\zihao{-4} 摘要}：\begingroup\songti\zihao{-4}\ignorespaces
+}
+
+\newcommand{\ChineseAbstractTextFinish}{%
+  \endgroup
+}
+
+\newcommand{\makeChineseKeywords}[1]{%
+  \par\vspace{\baselineskip}\noindent{\heiti\zihao{-4} 关键词：}\,{\songti\zihao{-4} #1}
+}
+
+\newcommand{\makeEnglishAbstractPersonalInfo}[4]{%
+  {%
+    \setstretch{1.25}\fontspec{Times New Roman}\zihao{-4}
+    \noindent\hspace*{\englishAbstractPersonalInfoIndent}%
+    \begin{tabular}{@{}l@{\hspace{3em}}l@{}}
+      Major：#1 & Student ID：\TNR{#2} \\[1.25em]
+      Student：#3 & Instructor：#4 \\
+    \end{tabular}
+  }\\
+}
+
+\newcommand{\makeEnglishAbstractHeader}[5]{%
+  \clearpage
+  \begin{center}
+    {\setstretch{1.25}\fontspec{Times New Roman}\bfseries\zihao{-2}#1\par}
+  \end{center}
+  \vspace{12pt}
+  \makeEnglishAbstractPersonalInfo{#2}{#3}{#4}{#5}
+}
+
+\newcommand{\EnglishAbstractTextStart}{%
+  {\heiti\zihao{-4} }\par\vspace{1ex}
+  \noindent {\fontspec{Times New Roman}\bfseries\zihao{-4} Abstract}:%
+  \begingroup\fontspec{Times New Roman}\zihao{-4}\setlength{\parindent}{2em}\ignorespaces
+}
+
+\newcommand{\EnglishAbstractTextFinish}{%
+  \endgroup
+}
+
+\newcommand{\makeEnglishKeywords}[1]{%
+  \par\vspace{\baselineskip}\noindent{\fontspec{Times New Roman}\bfseries\zihao{-4} Key words:}\,{\fontspec{Times New Roman}\zihao{-4} #1}
+}

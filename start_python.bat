@@ -1,11 +1,12 @@
 @echo off
 chcp 65001 >nul
 echo ==========================================
-echo   Yoga Assessment System - Python Version
+echo   Yoga Assessment System - Flask API
 echo ==========================================
 echo.
 
 cd /d D:\yuga_test
-echo Starting Python server on port 7860...
+set YOGA_API_PORT=5000
+echo Starting Python Flask API on http://localhost:%YOGA_API_PORT% ...
 echo.
-python run.py
+python python_api.py

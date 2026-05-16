@@ -1,15 +1,9 @@
-"""
-启动脚本
-用于启动瑜伽动作评估系统
-"""
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Run the current Flask REST backend."""
 
-import sys
-import os
+from python_api import main
 
-# 添加项目根目录到Python路径
-project_root = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, project_root)
 
 if __name__ == "__main__":
-    from src.app import main
     main()
