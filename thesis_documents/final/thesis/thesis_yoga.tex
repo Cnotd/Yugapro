@@ -2,10 +2,7 @@
 
 % === BEGIN INLINE: template/template/preamble.tex ===
 \usepackage{url}
-\IfFileExists{gbt7714.sty}{%
-  \usepackage{gbt7714}
-  \bibliographystyle{gbt7714-numerical}
-}{}
+\usepackage{gbt7714}
 \usepackage{geometry}
 \usepackage{fancyhdr}
 \usepackage{setspace}
@@ -13,19 +10,23 @@
 \usepackage{multirow}
 \usepackage{amssymb,amsmath}
 \usepackage{graphicx}
-\graphicspath{{../}}
-\IfFileExists{caption.sty}{\usepackage{caption}}{}
-\IfFileExists{subcaption.sty}{\usepackage{subcaption}}{}
+\graphicspath{{../../../}{../../templates/CDU_thesis_latex/}{../}{./}}
+\usepackage{subcaption}
+\usepackage{float}
 \usepackage{enumitem}
 \usepackage{etoolbox}
 \usepackage{xeCJK}
 \usepackage{fontspec}
 \usepackage{array}
-\IfFileExists{algorithm.sty}{\usepackage{algorithm}}{}
-\IfFileExists{algorithmicx.sty}{\usepackage{algorithmicx}}{}
-\IfFileExists{algpseudocode.sty}{\usepackage{algpseudocode}}{}
-\IfFileExists{pifont.sty}{\usepackage{pifont}}{}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{pifont}
 
+% 全局西文字体：正文中的英文和阿拉伯数字默认使用 Times New Roman。
+\setmainfont{Times New Roman}
+
+\bibliographystyle{gbt7714-numerical}
 \makeatletter
 \def\NAT@cmprs{\@ne}
 \patchcmd{\NAT@citexnum}
@@ -40,12 +41,8 @@
   {}{\PackageWarning{thesis}{Failed to patch citation compression}}
 \makeatother
 
-\newcommand{\TNR}[1]{{\fontspec{Times New Roman}#1}}
-\IfFileExists{pifont.sty}{%
-  \newcommand{\circnum}[1]{\ding{\numexpr171+##1\relax}}
-}{%
-  \newcommand{\circnum}[1]{(##1)}
-}
+\newcommand{\TNR}[1]{{\rmfamily #1}}
+\newcommand{\circnum}[1]{\ding{\numexpr171+#1\relax}}
 % === END INLINE: template/template/preamble.tex ===
 \usepackage{longtable}
 \usepackage{float}
@@ -668,11 +665,49 @@
 }
 
 \renewcommand{\YogaDatabaseERTikZ}{%
-\includegraphics[width=0.96\textwidth,keepaspectratio]{../images/er_3.3.png}%
+\includegraphics[width=0.96\textwidth,keepaspectratio]{../../../images/er_3.3.png}%
 }
 
 % === END INLINE: chapters/00_custom_macros.tex ===
 % === BEGIN INLINE: template/template/style.tex ===
+% 修复 ctex 的 \chapter 页首额外下移问题
+% 原因：ctex 的 \@makechapterhead / \@makeschapterhead 开头会执行
+% \vspace*{\CTEX@headingskip}，即使 beforeskip=0pt，
+% 也会在页首留下额外垂直项，导致正文一级标题比声明页标题低。
+
+\makeatletter
+
+\def\@makechapterhead#1{%
+  \begingroup
+    \CTEX@heading@format@initial
+    \CTEX@chapter@format{%
+      \CTEX@headinghang{chapter}%
+        {\CTEXifname{\CTEX@chaptername\CTEX@chapter@aftername}{}}%
+      \CTEX@chapter@titleformat{#1}%
+      \CTEX@chapter@aftertitle}%
+  \endgroup
+  \nobreak
+  \CTEX@setheadingskip \CTEX@chapter@afterskip
+  \ifodd \CTEX@chapter@fixskip \CTEX@fixheadingskip \fi
+  \vskip \CTEX@headingskip
+}
+
+\def\@makeschapterhead#1{%
+  \begingroup
+    \CTEX@heading@format@initial
+    \CTEX@chapter@format{%
+      \CTEX@headinghang{chapter}{}%
+      \CTEX@chapter@titleformat{#1}%
+      \CTEX@chapter@aftertitle}%
+  \endgroup
+  \nobreak
+  \CTEX@setheadingskip \CTEX@chapter@afterskip
+  \ifodd \CTEX@chapter@fixskip \CTEX@fixheadingskip \fi
+  \vskip \CTEX@headingskip
+}
+
+\makeatother
+
 % secnumdepth=2：编号到 subsection，即模板中的三级标题
 % tocdepth=2：目录显示到 subsection，即目录中显示三级标题
 % 后三句：强制编号格式改成阿拉伯数字层级形式
@@ -690,6 +725,25 @@
   }
 }
 
+\makeatletter
+\@ifundefined{ifThesisPrintVersion}{%
+  \newif\ifThesisPrintVersion
+  \ThesisPrintVersionfalse
+}{}
+\makeatother
+
+\newcommand{\InsertPrintBlankPage}{%
+  \ifThesisPrintVersion
+    \clearpage
+    \thispagestyle{empty}%
+    \null
+    \addtocounter{page}{-1}%
+    \clearpage
+  \fi
+}
+
+
+
 % 使用 ctexset 对章节标题、页眉页脚等样式进行定制，以满足学校对字体和字号的要求。
 % 一级标题（章标题）使用黑体、小三号字号，并居中排版；二级标题使用黑体四号；
 % 三级标题使用黑体小四号；四级标题使用楷体小四号；五级标题使用宋体加粗小四号。
@@ -698,22 +752,26 @@
     format=\centering\heiti\zihao{-3},
     nameformat=\heiti\zihao{-3},
     beforeskip=0pt,
-    afterskip=12pt,
+    afterskip=17pt,
+    aftername = {\;},
   },
   section={
-    format=\raggedright\setstretch{1.5}\heiti\zihao{4},
-    beforeskip=0pt,
-    afterskip=0pt,
+    format=\raggedright\heiti\zihao{4},
+    beforeskip=2pt,
+    afterskip=3pt,
+    aftername = {\;},
   },
   subsection={
     format=\raggedright\setstretch{1.5}\heiti\zihao{-4},
     beforeskip=0pt,
-    afterskip=0pt,
+    afterskip=3pt,
+    aftername = {\;},
   },
   subsubsection={
     format=\raggedright\setstretch{1.5}\kaishu\zihao{-4},
     beforeskip=0pt,
     afterskip=0pt,
+    aftername = {\;},
   }
 }
 
@@ -729,7 +787,7 @@
 % 页面设置
 \geometry{
   a4paper,
-  top=3cm,
+  top=2.9cm,
   bottom=4cm,
   left=2.5cm,
   right=2.5cm
@@ -745,7 +803,7 @@
 \fancyhf{}
 
 % 页眉：宋体五号（10.5pt）
-\fancyhead[C]{\songti\zihao{5} 成都大学本科毕业设计（论文）}
+\fancyhead[C]{\raisebox{4pt}{\songti\zihao{5} 成都大学本科毕业设计（论文）}}
 
 % 页脚：宋体小五（9pt）
 \fancyfoot[C]{\songti\zihao{-5}\thepage}
@@ -761,7 +819,7 @@
 % 正文字体及行距设置
 \newcommand{\ThesisBodyFont}{%
   \songti\zihao{-4}%
-  \linespread{1.25}\selectfont%
+  \linespread{1.35}\selectfont%
 }
 
 \newcommand{\ThesisBodyStyle}{%
@@ -778,131 +836,72 @@
   \ThesisBodyStyle
 }
 
-% 调研列表：编号格式为"（1）""（2）"。
+% 调研列表：编号格式为“（1）”“（2）”。
 \newlist{researchlist}{enumerate}{1}
 \setlist[researchlist]{%
   label=（\arabic*）,
   ref=（\arabic*）,
   labelindent=2em,
   leftmargin=*,
-  labelsep=0.5em,
-  listparindent=0pt,
-  itemindent=0pt,
-  align=left,
+  labelsep=0.2778em,
   itemsep=0pt,
   topsep=0pt,
   parsep=0pt,
   partopsep=0pt
-}
-
-\newcommand{\listbodyaligntext}[1]{%
-  \par\begingroup
-    \parindent=0pt
-    \parshape=2 2em \dimexpr\textwidth-2em\relax 0pt \textwidth
-    \noindent\ignorespaces#1\unskip\par
-  \endgroup
-}
-
-\newcommand{\researchlistitem}[1]{%
-  \csname item\endcsname #1%
-  \parshape=2 2em \dimexpr\textwidth-2em\relax 0pt \textwidth
 }
 
 \newcommand{\researchitem}[2]{%
-  \csname item\endcsname #1%
-  \listbodyaligntext{#2}%
-}
-
-\newcommand{\enumdescitem}[2]{%
-  \csname item\endcsname \textbf{#1}：%
-  \listbodyaligntext{#2}%
-}
-
-\newlist{chineseenum}{enumerate}{5}
-\setlist[chineseenum,1]{%
-  label=（\arabic*）,
-  ref=（\arabic*）,
-  labelindent=2em,
-  leftmargin=*,
-  labelsep=0.5em,
-  listparindent=0pt,
-  itemindent=0pt,
-  align=left,
-  itemsep=0pt,
-  topsep=0pt,
-  parsep=0pt,
-  partopsep=0pt
-}
-\setlist[chineseenum,2]{%
-  label=（\arabic*）,
-  ref=（\arabic*）,
-  labelindent=3em,
-  leftmargin=*,
-  labelsep=0.5em,
-  listparindent=0pt,
-  itemindent=0pt,
-  align=left,
-  itemsep=0pt,
-  topsep=0pt,
-  parsep=0pt,
-  partopsep=0pt
-}
-\setlist[chineseenum,3]{%
-  label=（\arabic*）,
-  ref=（\arabic*）,
-  labelindent=4em,
-  leftmargin=*,
-  labelsep=0.5em,
-  listparindent=0pt,
-  itemindent=0pt,
-  align=left,
-  itemsep=0pt,
-  topsep=0pt,
-  parsep=0pt,
-  partopsep=0pt
+  \item #1%
+  \par\begingroup
+    \leftskip=-\leftmargin
+    \rightskip=0pt
+    \parindent=2em
+    \noindent\hspace*{2em}\ignorespaces#2\unskip\par
+  \endgroup
 }
 
 % 目录点线：数字越小，点越密。默认约为 4.5，这里调成接近 Word 模板的密度。
 \makeatletter
-\renewcommand{\@dotsep}{1}
+\renewcommand{\@dotsep}{0.1}
 \renewcommand*\l@chapter[2]{%
   \ifnum \c@tocdepth >\m@ne
     \addpenalty{-\@highpenalty}%
-    \vskip 1.0em \@plus\p@
-    {\bfseries\@dottedtocline{0}{0em}{2.0em}{#1}{#2}}%
+    {\@dottedtocline{0}{0em}{1.8em}{#1}{#2}}%
     \penalty\@highpenalty
   \fi
 }
+
+\renewcommand*\l@section{%
+  \@dottedtocline{1}{2.0em}{1.8em}%
+}
+
+\renewcommand*\l@subsection{%
+  \@dottedtocline{2}{4.0em}{1.8em}%
+}
+
 \makeatother
 
+
 % 图题、表题格式：居中，黑体，五号。
-\makeatletter
-\@ifpackageloaded{caption}{%
-  \DeclareCaptionFont{thesiscaptionfont}{\heiti\zihao{5}}
-  \captionsetup{
-    font=thesiscaptionfont,
-    labelfont=thesiscaptionfont,
-    textfont=thesiscaptionfont,
-    justification=centering,
-    singlelinecheck=true,
-    parindent=0pt
-  }
-  \captionsetup[figure]{position=bottom, labelsep=space}
-  \captionsetup[table]{position=top, labelsep=space}
-}{}
-\makeatother
+\DeclareCaptionFont{thesiscaptionfont}{\heiti\zihao{5}}
+\captionsetup{
+  font=thesiscaptionfont,
+  labelfont=thesiscaptionfont,
+  textfont=thesiscaptionfont,
+  justification=centering,
+  singlelinecheck=true,
+  parindent=0pt
+}
+\captionsetup[figure]{position=bottom, labelsep=space}
+\captionsetup[table]{position=top, labelsep=space}
 
 % 表内文字：中文宋体五号，数字和英文使用 Times New Roman。
 \AtBeginEnvironment{tabular}{\songti\zihao{5}\fontspec{Times New Roman}}
 
 % 算法块输入、输出标签。
-\makeatletter
-\@ifpackageloaded{algorithm}{\floatname{algorithm}{算法}}{}
-\@ifpackageloaded{algpseudocode}{%
-  \algrenewcommand\algorithmicrequire{\textbf{输入：}}
-  \algrenewcommand\algorithmicensure{\textbf{输出：}}
-}{}
-\makeatother
+\floatname{algorithm}{算法}
+\algrenewcommand\algorithmicrequire{\textbf{输入：}}
+\algrenewcommand\algorithmicensure{\textbf{输出：}}
 
 % 浮动体内部不继承正文首行缩进，避免图片、表格和题名整体超出版心。
 \AtBeginEnvironment{figure}{\setlength{\parindent}{0pt}}
@@ -913,27 +912,47 @@
 \AtBeginEnvironment{thebibliography}{%
   \songti\zihao{5}%
   \linespread{1.25}\selectfont%
+  \setlength{\bibsep}{0pt}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\parskip}{0pt}%
+}
+
+% 摘要页版式距离：标题、个人信息表格、正文三块之间的距离都在这里控制。
+\newlength{\ChineseAbstractTitleInfoGap}
+\setlength{\ChineseAbstractTitleInfoGap}{28pt}
+\newlength{\ChineseAbstractInfoTextGap}
+\setlength{\ChineseAbstractInfoTextGap}{1.5em}
+\newlength{\EnglishAbstractTitleInfoGap}
+\setlength{\EnglishAbstractTitleInfoGap}{28pt}
+\newlength{\EnglishAbstractInfoTextGap}
+\setlength{\EnglishAbstractInfoTextGap}{1.5em}
+
+\newcommand{\makeAbstractTitle}[2]{%
+  {%
+    \centering
+    #1#2\par
+  }%
 }
 
 \newcommand{\makeAbstractPersonalInfo}[4]{%
   {%
-    \setstretch{1.25}\kaishu\zihao{-4}
+    \setstretch{1.25}%
     \noindent\hspace*{\abstractPersonalInfoIndent}% 摘要处个人信息左边距
-    \begin{tabular}{@{}l@{\hspace{3em}}l@{}}
-      专业：#1 & 学号：\TNR{#2} \\[1.25em]
-      学生：#3 & 指导教师：#4 \\[1.25em]
-    \end{tabular}
-  }\\
+    \begin{tabular}{@{}>{\kaishu\zihao{-4}}l@{\hspace{\abstractPersonalInfoColumnGap}}>{\kaishu\zihao{-4}}l@{}}
+      专业：#1 & 学\hspace{2em}号：\TNR{#2} \\[1.25em]
+      学生：#3 & 指导教师：#4
+    \end{tabular}\par
+  }%
 }
 
 \newcommand{\makeChineseAbstractHeader}[5]{%
   \clearpage
-  \begin{center}
-    {\setstretch{1.5}\heiti\zihao{-2}#1\par}
-  \end{center}
-  \vspace{12pt}
+  \makeAbstractTitle{\setstretch{1.5}\heiti\zihao{-2}}{#1}%
+  \vspace{\ChineseAbstractTitleInfoGap}
   %\addcontentsline{toc}{chapter}{摘要}
   \makeAbstractPersonalInfo{#2}{#3}{#4}{#5}
+  \vspace{\ChineseAbstractInfoTextGap}
 }
 
 \newcommand{\ChineseAbstractTextStart}{%
@@ -950,26 +969,24 @@
 
 \newcommand{\makeEnglishAbstractPersonalInfo}[4]{%
   {%
-    \setstretch{1.25}\fontspec{Times New Roman}\zihao{-4}
+    \setstretch{1.25}%
     \noindent\hspace*{\englishAbstractPersonalInfoIndent}%
-    \begin{tabular}{@{}l@{\hspace{3em}}l@{}}
-      Major：#1 & Student ID：\TNR{#2} \\[1.25em]
-      Student：#3 & Instructor：#4 \\
-    \end{tabular}
-  }\\
+    \begin{tabular}{@{}>{\fontspec{Times New Roman}\zihao{-4}}l@{\hspace{\englishAbstractPersonalInfoColumnGap}}>{\fontspec{Times New Roman}\zihao{-4}}l@{}}
+      Major：#1 & Student ID：\TNR{#2} \\[1.5em]
+      Student：#3 & Instructor：#4
+    \end{tabular}\par
+  }%
 }
 
 \newcommand{\makeEnglishAbstractHeader}[5]{%
   \clearpage
-  \begin{center}
-    {\setstretch{1.25}\fontspec{Times New Roman}\bfseries\zihao{-2}#1\par}
-  \end{center}
-  \vspace{12pt}
+  \makeAbstractTitle{\setstretch{1.25}\fontspec{Times New Roman}\bfseries\zihao{-2}}{#1}%
+  \vspace{\EnglishAbstractTitleInfoGap}
   \makeEnglishAbstractPersonalInfo{#2}{#3}{#4}{#5}
+  \vspace{\EnglishAbstractInfoTextGap}
 }
 
 \newcommand{\EnglishAbstractTextStart}{%
-  {\heiti\zihao{-4} }\par\vspace{1ex}
   \noindent {\fontspec{Times New Roman}\bfseries\zihao{-4} Abstract}:%
   \begingroup\fontspec{Times New Roman}\zihao{-4}\setlength{\parindent}{2em}\ignorespaces
 }
@@ -983,24 +1000,37 @@
 }
 % === END INLINE: template/template/style.tex ===
 % === BEGIN INLINE: chapters/00_local_defs.tex ===
-\newcommand{\abstractPersonalInfoIndent}{8em}
-\newcommand{\englishAbstractPersonalInfoIndent}{3em}
+\newcommand{\abstractPersonalInfoIndent}{5em}
+\newcommand{\abstractPersonalInfoColumnGap}{12em}
+\newcommand{\englishAbstractPersonalInfoIndent}{5em}
+\newcommand{\englishAbstractPersonalInfoColumnGap}{3em}
 
 \newcommand{\thesisTitleLineA}{基于多模态大模型的}
 \newcommand{\thesisTitleLineB}{瑜伽动作评估系统}
 \newcommand{\thesisCollege}{计算机学院}
 \newcommand{\thesisMajor}{计算机科学与技术}
+\newcommand{\thesisMajorEn}{Computer Science and Technology}
 \newcommand{\studentName}{曹黎骏}
+\newcommand{\studentNameEn}{Cao Lijun}
 \newcommand{\studentId}{202210305212}
 \newcommand{\studentClass}{计科1班}
 \newcommand{\advisorName}{张楗伟}
+\newcommand{\advisorNameEn}{Jianwei Zhang}
 \newcommand{\advisorTitle}{讲师}
 \newcommand{\thesisCompletionDate}{2026 年 \quad 3 月 \quad 23 日}
 \newcommand{\authorSignature}{曹黎骏}
+\newcommand{\advisorSignature}{张楗伟}
 \newcommand{\thesisDeclarationDate}{2026 年 3 月 23 日}
 
-\setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{2}
+\newcommand{\listbodyaligntext}[1]{%
+  \par\begingroup
+    \leftskip=-\leftmargin
+    \rightskip=0pt
+    \parindent=2em
+    \noindent\hspace*{2em}\ignorespaces#1\unskip\par
+  \endgroup
+}
+
 % === END INLINE: chapters/00_local_defs.tex ===
 
 \begin{document}
@@ -1013,15 +1043,22 @@
 \newlength{\midlabelwd}   % 班级/职称 标签列宽
 
 \setlength{\labelwd}{2.43cm} % Word 模板左侧标签列宽
-\setlength{\fullwd}{7.88cm}  % Word 模板整行下划线列宽
-\setlength{\leftlinewd}{3.56cm}
+\setlength{\fullwd}{10.5cm}  % Word 模板整行下划线列宽
+\setlength{\leftlinewd}{4.76cm}
 \setlength{\midlabelwd}{1.50cm}
-\setlength{\rightlinewd}{2.82cm}
+\setlength{\rightlinewd}{3.77cm}
 
 \newcommand{\coverLabelFont}{\heiti\fontsize{18pt}{22pt}\selectfont}
 \newcommand{\coverValueFont}{\heiti\fontsize{16pt}{20pt}\selectfont}
-\newcommand{\coverline}[2]{%
-  \underline{\makebox[#1][c]{{\coverValueFont #2}}}%
+
+
+\newcommand{\coverline}[2]{%                             % 封面下划线格式
+  \makebox[#1][c]{%
+    \ooalign{%
+      \hfil{\coverValueFont #2}\hfil\cr
+      \smash{\raisebox{-4.5pt}{\rule{#1}{0.4pt}}}\cr     % 文字位置不变，将下划线往下移动4.5pt
+    }%
+  }%
 }
 \newcommand{\covertwolabel}[2]{%
   {\coverLabelFont\makebox[\labelwd][l]{#1\hspace{2.0em}#2}}%
@@ -1032,21 +1069,14 @@
 \newcommand{\covermidlabel}[1]{%
   {\coverValueFont\makebox[\midlabelwd][c]{#1}}%
 }
-\IfFontExistsTF{Microsoft YaHei}{%
-  \newcommand{\coverTitleFont}{\CJKfontspec{Microsoft YaHei}}%
-}{%
-  \IfFileExists{fonts/msyhbd.ttc}{%
-    \newcommand{\coverTitleFont}{\CJKfontspec[Path=fonts/]{msyhbd.ttc}}%
-  }{%
-    \newcommand{\coverTitleFont}{\heiti}%
-  }%
-}
+
+\newcommand{\coverTitleFont}{\CJKfontspec[Path=../../templates/CDU_thesis_latex/fonts/]{msyhbd-title.ttf}}
 
 \begin{titlepage}
   \thispagestyle{empty}
    \begin{center}
 	   \vspace*{-26pt}
-	   \includegraphics[width=0.68\textwidth]{figs/cdu.pdf}
+	   \includegraphics[width=10.72cm,height=3.25cm]{figs/cdu.pdf}
 
 		    \vspace{25pt}
     % 封面主标题使用微软雅黑加粗，按 Word 模板视觉放大。
@@ -1083,16 +1113,17 @@
   \vspace{12pt}%
 }
 
+% 成大论文模板要求1.25倍行距，宋体，小三号，这里经过像素级对比使用1.3倍行距保证视觉效果一致
 \newcommand{\declarationbodyfont}{%
-  \setstretch{1.25}\songti\zihao{-3}%
+  \setstretch{1.30}\songti\zihao{-3}%
 }
 
 \newcommand{\signaturefield}[1]{%
   \makebox[8em][l]{#1}%
 }
 
-% 前言部分使用罗马数字编号
-\pagenumbering{Roman}
+% 声明页不参与前置部分的罗马页码编号；罗马页码从摘要开始。
+\pagenumbering{gobble}
 
 % 原创性声明
 %\chapter*{{\heiti\zihao{-2} 原创性声明}}
@@ -1109,6 +1140,8 @@
 %\indent 论文作者签名：\signaturefield{} 日期：\\
 }% 结束宋体小三号设置
 
+\InsertPrintBlankPage
+
 % 使用授权声明
 %\chapter*{{\heiti\zihao{-2} 关于使用授权的声明}}
 \heitchapter{关于使用授权的声明}
@@ -1123,11 +1156,14 @@
 \indent 本毕业设计（论文）内容不涉及国家秘密、商业秘密及其他需要保密的内容，适用于上述授权。\\
 
 %\indent 论文作者签名：\signaturefield{} 日期：\\
-\indent 论文作者签名：\signaturefield{\authorSignature} 日\quad 期：\thesisDeclarationDate\\[2ex]
+\indent 论文作者签名：\signaturefield{\authorSignature} 日\quad 期：\thesisDeclarationDate\\
 
-
-\indent 指导教师签名：\signaturefield{} 日\quad 期：\\
+\indent 指导教师签名：\signaturefield{\advisorSignature} 日\quad 期：\thesisDeclarationDate \\
 }% 结束宋体小三号设置
+
+\InsertPrintBlankPage
+
+\clearpage
 % === END INLINE: template/template/declarations.tex ===
 % === BEGIN INLINE: chapters/01_abstracts.tex ===
 \makeChineseAbstractHeader
@@ -1137,13 +1173,13 @@
   {曹黎骏}
   {张楗伟}
 \ChineseAbstractTextStart
-本文所研究的居家瑜伽练习动作评估问题是，很多居家瑜伽练习者跟着练瑜伽视频能跳动作，但是对动作关节、身体对齐、动作稳定是否做到位是没有办法正确反馈的。正位与控制是瑜伽训练中重要的一环，如果肩、髋、膝、脊柱长期处在不合理的正位中，训练的效果会因肢体的问题而减缩，运动损伤的风险也会愈加大，线下教练对动作的纠正是即时可以反馈的，但是会受到时间、位置、费用等条件的约束，而居家练习瑜伽的更多是居家练习者，更需要一套可以反复使用、反馈相对清晰，并且易于留存的辅助评估工具。
+本文面向居家瑜伽练习中的动作评估问题展开研究。居家练习者虽然可以跟随视频完成体式，但往往难以判断关节角度、身体对齐和动作稳定性是否达到要求。线下教练能够提供即时纠正，却受到时间、地点和费用限制，因此有必要构建一套可反复使用、反馈清晰且便于留存的辅助评估工具。
 
-围绕这一需求，本文设计与实现了一套基于多模态大模型的瑜伽动作评估系统，其采用前后端分离的架构进行实现：前端通过HTML、CSS和原生JavaScript实现注册登录，视频上传，任务轮询与结果展示的功能；以Flask框架为后端框架为其提供RESTful接口，并辅以SQLite数据库来储存相应的用户信息、视频任务、评估记录与系统日志。算法上，以采用MediaPipe Pose姿态估计算法为底层姿态提取工具，提取视频的33个身体关键点后，通过OpenCV几何计算和时序统计等方式计算出关节角度、对身体对等的偏差、动作稳定程度等结构化特征。
+围绕这一需求，本文设计并实现了一套基于多模态大模型的瑜伽动作评估系统。系统采用前后端分离架构，前端基于HTML、CSS和原生JavaScript实现注册登录、视频上传、任务轮询与结果展示；后端以Flask提供RESTful接口，并使用SQLite存储用户信息、视频任务、评估记录与系统日志。算法层以MediaPipe Pose提取视频中的33个人体关键点，再通过OpenCV和时序统计计算关节角度、身体对齐偏差与动作稳定性等结构化特征。
 
-在评估方法上，本文并未完全移交给外部模型打分的过程，系统保留了本地规则评估模块，由其根据动作标准库完成规则执行的基础打分和问题定位，再将关键帧、规则结果、结构化特征发送给网上的千问多模态模型，由其帮助生成更加自然的反馈文本和改善建议。这么做可以使得评估结果尽量可解释同时也可以在网络服务不太稳定的时候提供降级的结果。系统中先后经历了Python原型验证、Rust后端试做、Flask工程化落地三个阶段，目前已在联调中先后发现角色字段不一致、任务同步阻塞、SQLite锁冲突、数据库触发器错误、空对象引用、代理变量干扰模型请求数据的问题。
+在评估方法上，系统保留本地规则评估模块，用于完成基础打分和问题定位，再将关键帧、规则结果与结构化特征发送给千问多模态模型，生成更自然的反馈文本和改进建议。该设计兼顾结果可解释性与模型表达能力，并能在网络服务不稳定时提供降级输出。
 
-最终实现系统已经完成了注册、登录、视频上传、后台异步处理、状态查询、结果回显、历史记录留存等主要链路，测试亦表明了系统可以在本地环境下完成完整的视频输入和评估输出流程，且至少在部分异常场景下保证基本可用。姿态估计算法本身并非本文主要工作，仅仅作为任务输入端的一种实现形式，重点还是在于把视觉分析、规则推断、多模态反馈、Web工程实现整合成一套可以运行、可以验证、也可以继续扩展的毕设原型。
+最终系统完成了注册、登录、视频上传、后台异步处理、状态查询、结果回显和历史记录留存等主要链路。测试表明，系统能够在本地环境下完成从视频输入到评估反馈的完整流程，并在部分异常场景下保持基本可用，形成了一套可运行、可验证且可继续扩展的毕业设计原型。
 \ChineseAbstractTextFinish
 \makeChineseKeywords{瑜伽动作评估；多模态大模型；Flask框架；前后端分离；姿态估计}
 
@@ -1189,10 +1225,10 @@ For evaluation, the project keeps a local rule-based scoring mechanism as the ba
 
 线下教练能给予及时的反馈，这是传统教学方式最直接的优势。但这样的方式也有一个现实的边界，课程时间要合二为一，场地并不总是便利，长期上课也要负担一笔不小的费用。更关键的是，很多纠正意见停留在课堂当下，当练习者回到家里以后，依旧缺少一套可以随时复看反复比较留下记录的量化依据。也正因为如此，居家场景并不只是一个缺“能看动作”的工具，而是缺一套“能说明哪里有问题、为什么有问题、怎样调整”的辅助系统。
 
-而计算机视觉、姿态估计、多模态模型的发展，让这个问题有了可以落地实施的技术路线。工程实现上，系统使用Flask框架\cite{ref_flask}构建后端接口，并采用SQLite数据库\cite{ref_sqlite}保存用户、视频任务、评估记录与系统日志；算法链路上，MediaPipe姿态估计算法\cite{ref_mediapipe}能够比较稳定地抽取出视频中的33个关键点，加上OpenCV\cite{ref_opencv}几何计算，系统就可以获得输出的关节和角度、对齐、动作稳定性等指标；在反馈生成阶段，系统再将结构化特征和关键帧信息交给千问多模态模型\cite{ref_qwen}处理，使其具备把“数字结果”翻译成更贴近日常教学语言的反馈文本的机会。基于这个背景，本文将以“基于多模态大模型的瑜伽动作评估系统”作为毕设题目，完成了一套可以运行、能够联调、能够保存结果和支撑论文论证的工程原型。
+而计算机视觉、姿态估计、多模态模型的发展，让这个问题有了可以落地实施的技术路线，相关中文综述也表明，深度学习姿态估计和视觉语言预训练正在从单一识别逐步走向结构化理解与交互反馈\cite{ref_cn_pose_estimation_survey,ref_cn_visual_language_pretraining}。工程实现上，系统使用Flask框架\cite{ref_flask}构建后端接口，并采用SQLite数据库\cite{ref_sqlite}保存用户、视频任务、评估记录与系统日志；算法链路上，MediaPipe姿态估计算法\cite{ref_mediapipe}能够比较稳定地抽取出视频中的33个关键点，加上OpenCV\cite{ref_opencv}几何计算，系统就可以获得输出的关节和角度、对齐、动作稳定性等指标；在反馈生成阶段，系统再将结构化特征和关键帧信息交给千问多模态模型\cite{ref_qwen}处理，使其具备把“数字结果”翻译成更贴近日常教学语言的反馈文本的机会。基于这个背景，本文将以“基于多模态大模型的瑜伽动作评估系统”作为毕设题目，完成了一套可以运行、能够联调、能够保存结果和支撑论文论证的工程原型。
 
 \section{国内外研究现状}
-动作识别、姿态评估是计算机视觉领域的重要研究方向。在该领域，围绕这个方向，其实已经研究了很久。Andriluka等人\cite{ref_mpii}建立的MPII人体姿态数据集至今仍是该领域重要的基准测试资源。Wei等人\cite{ref_cpm}提出的卷积姿态机通过多阶段细化有效提升了姿态估计精度。Chen等人\cite{ref_cpn}提出的级联金字塔网络则在处理遮挡和多人场景方面表现优异。Saraf等人\cite{ref_har_survey}对基于深度学习的人体活动识别方法进行了系统综述，总结了从骨架序列到时空图卷积等多种技术路线。Singh等人\cite{ref_lstm_pose_action}则探索了利用LSTM网络从姿态序列中进行动作识别的方法。这些研究为瑜伽动作识别与评估提供了重要的技术基础和方法参考。以前更多关注的是“人在做什么动作”。而后来更多关注的是“这个动作做得是否规范”。这两个问题看着很接近，但难易程度其实是有区别的。前者偏分类。而后者不仅要识别动作，还要解释偏差、定位问题和给出反馈，所以对算法、规则、输出形式的要求都更高。
+动作识别、姿态评估是计算机视觉领域的重要研究方向。在该领域，围绕这个方向，其实已经研究了很久。国内关于视频人体动作识别的研究综述指出，动作识别方法已经从传统手工特征逐渐发展到深度网络、时序建模和骨架序列建模等路线\cite{ref_cn_video_action_survey}。Andriluka等人\cite{ref_mpii}建立的MPII人体姿态数据集至今仍是该领域重要的基准测试资源。Wei等人\cite{ref_cpm}提出的卷积姿态机通过多阶段细化有效提升了姿态估计精度。Chen等人\cite{ref_cpn}提出的级联金字塔网络则在处理遮挡和多人场景方面表现优异。Saraf等人\cite{ref_har_survey}对基于深度学习的人体活动识别方法进行了系统综述，总结了从骨架序列到时空图卷积等多种技术路线。Singh等人\cite{ref_lstm_pose_action}则探索了利用LSTM网络从姿态序列中进行动作识别的方法。这些研究为瑜伽动作识别与评估提供了重要的技术基础和方法参考。以前更多关注的是“人在做什么动作”。而后来更多关注的是“这个动作做得是否规范”。这两个问题看着很接近，但难易程度其实是有区别的。前者偏分类。而后者不仅要识别动作，还要解释偏差、定位问题和给出反馈，所以对算法、规则、输出形式的要求都更高。
 
 如果只看底层姿态感知，现阶段已经有开发较为成熟的开源工具可以利用，早先的手段更多地依赖人为主观设计特征的图像方法和几何模型。他们对于背景复杂或人体遮挡情况或是光照不稳定等方面的鲁棒性往往较差，OpenPose\cite{ref_openpose}之后的多人姿态的检测能力有了较为明显的提升，但它对算力的需求也更高，普通的开发机部署与调试的成本也相对更多。Newell等人\cite{ref_hourglass}提出的堆叠沙漏网络和Xiao等人\cite{ref_simple_baselines}提出的Simple Baselines方法在人体姿态估计领域取得了显著进展，其中Simple Baselines以其简洁的网络结构在精度和速度之间取得了较好平衡。而Zheng等人\cite{ref_pose_survey}的综述研究则系统梳理了深度学习时代人体姿态估计技术的发展脉络。本文调研发现，瑜伽动作识别方向也有学者开展过相关工作，如Zhang等人\cite{ref_yoga_recognition}和Field等人\cite{ref_yoga_pose_estimation}分别从视频分析和姿态估计角度对瑜伽动作进行了识别与校正研究。而MediaPipe姿态估计算法\cite{ref_mediapipe}似乎更适合本文这种以本地验证与落地工程为主的课题，它基于BlazePose架构，输出33个关键点，模型的推理速度也适合在普通PC环境下部署，被广泛地应用在需要轻量化的人体姿态分析的场景。
 
@@ -1208,7 +1244,7 @@ For evaluation, the project keeps a local rule-based scoring mechanism as the ba
   }
   
 \researchitem{多模态联合评估}{
-    这个角度是近两年更多人关注的一个角度，尝试将视频关键帧，姿态序列和结构化特征同时交给多模态模型，然后输出自然语言的评价语。Papadopoulos等人\cite{ref_multimodal_concept}在跨领域多模态概念检测方面的研究为多模态特征融合提供了重要参考，Horn\cite{ref_pose_hierarchy}关于层次化姿态估计的综述研究则从另一个视角梳理了姿态感知技术的发展脉络。Rich等人\cite{ref_3d_pose_tracking}在3D人体姿态估计与跟踪方面的工作进一步拓展了姿态分析的维度。其特点是表达能力更强，更贴合日常的教学场景，但会涌现更多新的问题，例如：提示语词设计，输出格式控制，接口稳定性问题，成本问题。
+    这个角度是近两年更多人关注的一个角度，尝试将视频关键帧，姿态序列和结构化特征同时交给多模态模型，然后输出自然语言的评价语。国内视觉语言多模态预训练综述对图文对齐、跨模态融合和下游任务迁移进行了系统梳理，也说明多模态模型具备把视觉信息与文本语义共同建模的技术基础\cite{ref_cn_visual_language_pretraining}。Papadopoulos等人\cite{ref_multimodal_concept}在跨领域多模态概念检测方面的研究为多模态特征融合提供了重要参考，Horn\cite{ref_pose_hierarchy}关于层次化姿态估计的综述研究则从另一个视角梳理了姿态感知技术的发展脉络。Rich等人\cite{ref_3d_pose_tracking}在3D人体姿态估计与跟踪方面的工作进一步拓展了姿态分析的维度。其特点是表达能力更强，更贴合日常的教学场景，但会涌现更多新的问题，例如：提示语词设计，输出格式控制，接口稳定性问题，成本问题。
   }
 \end{researchlist}
 
@@ -1313,14 +1349,14 @@ For evaluation, the project keeps a local rule-based scoring mechanism as the ba
 上传接口只做三件事，接收文件保存到安全目录、在数据库插入一条状态为processing的任务、返回唯一的任务编号给前端。真正的工作由后台的异步线程来分析，耗时比较长。前端再轮询单独跟踪任务的状态。接口可以尽快返回，前端页面不会长时间卡住，用户也能持续看到任务进展。
 
 \subsection{姿态多维特征提取}
-姿态特征提取是算法部分。系统最后是否有依据说断话，很大程度上取决于提供给系统的输入数据是否是稳定的、是否是有意义的。视频本身是一个片段连续像素的集合，并不是给人们提供直接打分的信息，算法系统需要先把原始画面转化成结构化的人体姿态数据。
+姿态特征提取是算法部分。系统最后是否有依据说断话，很大程度上取决于提供给系统的输入数据是否是稳定的、是否是有意义的。视频本身是一个片段连续像素的集合，并不是给人们提供直接打分的信息，算法系统需要先把原始画面转化成结构化的人体姿态数据。已有面向健身行为的人体姿态估计与动作识别研究也表明，骨架关键点、关节角度和动作时序特征可以较好支撑运动行为识别与规范性分析\cite{ref_cn_fitness_pose_action}。
 
 具体来讲，这步做完至少有三层内容，第一层，抽帧、废帧过滤，尽量去掉准备动作、空画面、镜头变动阶段，第二层，解算颈、肩、肘、腕、髋、膝、踝等骨干节点三维坐标与置信度，作为下一步计算的根据地，第三步，在原始坐标基础上继续构造二级特征，比如大腿小腿夹角、左右骨盆的水平偏差，躯干倾斜程度等等，比起坐标，好对应到真实体式问题。
 
 瑜伽评估并非判断某一帧是否“摆到了位”就可以，接下来要考虑动作维持阶段是否稳定，所以系统还对动作持续过程做了一些时序统计，比如角度波动、稳定性指标的计算，用来判断维持动作阶段的控制能力。
 
 \subsection{混合智能评估}
-评估报告最终是给用户直接阅读的，因此，系统没有只保留一个总分，而是沿用混合评估的思路，将本地规则系统和多模态模型结合起来使用。
+评估报告最终是给用户直接阅读的，因此，系统没有只保留一个总分，而是沿用混合评估的思路，将本地规则系统和多模态模型结合起来使用。大语言模型研究综述指出，这类模型在自然语言理解、生成和指令跟随方面表现出较强能力，但也需要通过提示约束、结构化输出和异常处理降低不可控性\cite{ref_cn_llm_survey}。
 
 其中规则系统要给出量化结果是什么，比如有哪些关节超出容差，哪些对齐关系不能达到标准，扣的分数是什么；多模态模型在结构化结果的基础上给出更加贴近我们日常表达的建议，将角度偏差和关键帧信息进行重新表达，可能使用更易懂的字眼。一方面我们可以保持可解释性，另一方面让结果更加可阅读。
 
@@ -1358,17 +1394,9 @@ For evaluation, the project keeps a local rule-based scoring mechanism as the ba
   }
 \end{researchlist}
 
-这些指标虽然不代表功能模块那么直观，但是其实它们决定了系统是否能演示稳定，决定了系统能否扛得住联调，也决定了是否会让用户愿意继续使用。
+这些指标虽然不如功能模块直观，却直接决定系统能否稳定演示和持续使用。本文重点区分接口响应时间与任务完成时间，通过异步任务降低用户感知阻塞；同时通过文件校验、异常捕获、状态回写和规则兜底处理输入质量不确定、模型接口失败、数据库短暂锁定等情况。
 
-在响应性方面，系统需要区分“接口响应时间”和“任务完成时间”。上传接口如果同步等待完整视频分析结束，接口响应时间就会被拉长到几十秒，用户体验很差；而采用异步任务后，接口只负责创建任务并返回编号，真正的任务完成时间通过轮询展示给用户。这样虽然总处理时间没有被缩短，但用户感知上的阻塞被显著降低。对于需要视频分析的系统来说，这种响应性设计比单纯优化某个函数执行时间更符合实际需求。
-
-在稳定性方面，系统必须能够处理输入质量不确定的问题。用户上传的视频可能存在编码异常、时长过长、画面过暗、人物未完整入镜等情况。如果后端没有在文件校验和异常捕获阶段做好处理，这些输入很容易导致线程异常退出或任务状态无法更新。本文在实现中通过文件类型检查、异常捕获、任务状态回写和默认结果返回来增强稳定性，使系统即使不能完成理想分析，也能明确告诉用户失败原因。
-
-在资源占用方面，视频分析天然比普通 Web 请求更重。抽帧数量如果过多，会增加 CPU 和内存压力；抽帧数量过少，又会影响动作分析完整性。系统最终采用限制最大处理帧数并保留关键运动帧的方式，在准确性和运行成本之间折中。对于本科毕业设计演示环境来说，这种折中是合理的，因为它既能避免机器长时间高负载，也能保证分析结果具有基本参考价值。
-
-在可恢复性方面，系统需要保证失败不会扩散。模型接口失败时，应当退回规则评估；数据库短暂锁定时，应当通过等待和重试缓解；未知体式名称出现时，应当返回默认模板，而不是让空对象异常中断流程。本文把这些情况都纳入性能需求，是因为系统性能并不只体现在顺利情况下跑得快，更体现在异常情况下是否还能维持可解释的输出。
-
-最后，系统性能还与论文结论的边界有关。本文没有声称系统已经完成大规模并发压测，也没有给出商业部署级别的性能指标。当前测试主要证明系统在本地单机和小规模任务下可运行、可反馈、可追踪。这样的表述更符合现有材料，也为后续工作留下了明确方向：如果未来继续扩展，就需要引入更严格的压力测试、队列调度和数据库迁移方案。
+在资源占用方面，视频分析比普通 Web 请求更重，因此系统通过限制处理帧数和保留关键运动帧，在准确性与运行成本之间折中。本文当前测试主要证明系统在本地单机和小规模任务下可运行、可反馈、可追踪，大规模并发压测与队列调度仍属于后续扩展方向。
 
 % 第三章 系统的设计与实现
 \chapter{系统的设计}
@@ -1867,7 +1895,7 @@ system\_log & 安全与维保探针。字段包括日志编号、日志级别、
   \label{fig:register_seq}
 \end{figure}
 
-用户注册认证时序完整展示了系统从接收用户注册请求到完成账号创建的全过程。首先，用户在前端页面填写用户名、邮箱以及密码等注册信息，前端在完成基础格式校验后，通过 \texttt{POST /api/register} 接口将数据发送至后端服务。后端接收到请求后，并不会直接写入数据库，而是优先执行用户名与邮箱的唯一性检查，通过 \texttt{SELECT} 查询判断当前账号信息是否已经存在，以避免重复注册问题。在确认用户信息不存在后，系统进入密码安全处理阶段。后端利用 \texttt{bcrypt.hash(12)} 对用户输入的明文密码进行加密处理，其中参数 12 表示哈希计算的复杂度等级。采用 bcrypt 算法能够有效防止彩虹表攻击和数据库泄露后的密码逆向破解，提高系统整体的账户安全性。加密完成后，系统仅将生成的 \texttt{password\_hash} 保存到数据库中，而不会直接存储用户原始密码，从根本上降低了敏感信息泄露风险。随后，后端执行 \texttt{INSERT} 操作，将新用户信息写入数据库。当数据库返回插入成功结果后，后端向前端返回 \texttt{201 Created} 状态码，表示用户账号创建成功。前端接收到响应后，再执行页面跳转或提示注册成功等操作，完成整个注册流程。该时序图不仅体现了前后端分离架构下的接口交互逻辑，也强调了用户认证过程中“先校验、后加密、再存储”的安全处理顺序。如果忽略用户名查重、密码哈希或状态码规范返回等步骤，系统将容易出现账户冲突、密码泄露以及接口安全性不足等问题。因此，在实际开发中，注册认证流程必须严格按照该时序执行，以保证系统的安全性、稳定性与数据一致性。
+用户注册认证时序展示了系统从接收请求到完成账号创建的全过程。前端提交用户名、邮箱和密码后，后端先检查用户名与邮箱是否重复，再使用 \texttt{bcrypt.hash(12)} 对密码加密，仅将 \texttt{password\_hash} 写入数据库。注册成功后，系统返回 \texttt{201 Created}。该流程强调“先校验、后加密、再存储”的顺序，以降低账户冲突和密码泄露风险。
 
 \clearpage
 用户登录与 JWT 签发时序（图~\ref{fig:login_seq}）： 
@@ -1879,7 +1907,7 @@ system\_log & 安全与维保探针。字段包括日志编号、日志级别、
   \label{fig:login_seq}
 \end{figure}
 
-登录时序图体现了无状态鉴权的实现思路。服务端不长期保存会话上下文，而是通过 JWT 封装用户身份和生命周期信息。这样能简化后端状态管理，但也要求前端在后续请求中正确携带和处理凭证。
+登录时序图体现无状态鉴权思路。服务端通过 JWT 封装用户身份、角色和过期时间，前端在后续请求中携带凭证，由后端统一校验。
 
 \clearpage
 高并发评估调度时序（图~\ref{fig:assessment_seq}）：
@@ -1891,7 +1919,7 @@ system\_log & 安全与维保探针。字段包括日志编号、日志级别、
   \label{fig:assessment_seq}
 \end{figure}
 
-这一部分直接决定用户等待过程是否平滑。用户看到的只是“上传后正在处理中”，但背后还经历了任务入队、线程启动、状态更新、轮询查询和结果回写等多个步骤。只有这些步骤协同顺畅，前端才能稳定呈现进度和结果。
+该时序决定用户等待过程是否平滑。后台需完成任务入队、线程启动、状态更新、轮询查询和结果回写，前端才能稳定展示进度与结果。
 
 \clearpage
 管理员防越权干预时序（图~\ref{fig:admin_seq}）：
@@ -1903,11 +1931,131 @@ system\_log & 安全与维保探针。字段包括日志编号、日志级别、
   \label{fig:admin_seq}
 \end{figure}
 
-管理员时序设计的意义，在于把“能做什么”和“谁能做”明确分开。普通用户请求即使进入相同路由前缀，只要角色不满足条件，也必须在拦截层直接被拒绝，这样才能避免越权修改用户状态的风险。
+管理员时序用于明确区分“能做什么”和“谁能做”。普通用户即使访问相同路由前缀，也必须因角色不满足条件而被拦截，避免越权修改用户状态。
 
 
 % 第四章 系统测试
-\chapter{系统测试}
+\chapter{系统测试与综合分析}
+
+\section{测试目的}
+系统测试的目的在于验证本文设计的基于多模态大模型的瑜伽动作评估系统是否能够按照设计要求稳定运行，并检查其在功能实现、业务流程、视频处理、姿态分析、模型反馈和数据管理等方面的完整性。本文系统集成了用户认证、视频上传、后台异步任务、姿态关键点提取、规则评估、多模态反馈、结果展示、历史记录和后台管理等模块，因此需要通过测试确认各功能模块是否能够正常使用，前后端交互是否顺畅，数据是否能够正确保存和展示。
+
+在功能层面，测试重点包括普通用户端的注册登录、视频上传、任务状态查询、评估结果展示、历史记录查看等功能，以及管理端的用户管理、任务查看、系统日志和异常追踪等功能。通过这些测试，可以判断系统是否满足居家瑜伽练习辅助评估和后台维护的基本需求。
+
+在算法与模型服务层面，测试需要验证 MediaPipe 姿态估计、OpenCV 视频处理、规则评分模块和千问多模态模型反馈是否能够正常工作。同时，还需要检查视频格式异常、关键点识别失败、动作标准缺失或模型调用异常时，系统是否能够执行降级处理并给出合理反馈，避免影响核心评估流程。
+
+在数据与安全层面，测试需要确认用户信息、视频任务、评估记录、系统日志和历史结果等数据能够正确写入 SQLite 数据库，并能在相关页面中继续使用。同时，还需要验证 JWT 身份认证、普通用户与管理员权限隔离、未登录访问拦截和密码加密存储等安全机制是否有效。
+
+综上，本章测试的主要目标是从功能正确性、模型调用可用性、数据持久化、安全性和系统稳定性等方面对系统进行综合验证，以说明本文提出的姿态分析、规则评估与多模态反馈结合方案能够在居家瑜伽动作评估场景中有效运行。
+
+\section{功能性需求测试}
+功能性需求测试主要用于验证系统各业务模块是否能够按设计要求正常运行，并检查前端页面、后端接口、数据库和模型服务之间的数据流转是否正确。本文系统面向普通用户和管理员两类用户，测试内容覆盖用户认证、视频上传、异步评估、姿态特征提取、规则评分、多模态反馈、历史记录、结果展示和用户管理等模块。
+
+本文采用黑盒测试方法，从用户实际操作角度设计测试用例。测试时分别启动前端页面和 Flask 后端服务，使用测试账号登录系统，并按功能模块逐项操作，观察页面反馈、接口返回、任务状态和数据保存是否符合预期。其中，用户端重点测试视频上传、任务轮询、评估结果生成和历史记录保存；管理端重点测试用户列表、任务记录、异常日志和权限边界等功能。
+
+系统功能性需求测试用例如表~\ref{tab:function_test} 所示。
+
+\begin{table}[H]
+  \centering
+  \caption{系统功能性需求测试用例}
+  \label{tab:function_test}
+  \begin{tabular}{p{1.35cm}p{2.0cm}p{2.5cm}p{4.0cm}p{3.0cm}}
+    \toprule
+    测试编号 & 测试模块 & 测试内容 & 测试步骤 & 预期结果 \\
+    \midrule
+    FT-01 & 用户认证 & 登录与权限识别 & 输入普通用户账号并访问用户端 & 登录成功，权限控制正常 \\
+    FT-02 & 用户注册 & 账号创建与字段校验 & 输入用户名、邮箱和密码提交注册 & 注册成功，用户信息写入数据库 \\
+    FT-03 & 视频上传 & 文件选择与任务创建 & 上传 MP4 或 MOV 格式瑜伽视频 & 返回任务编号，任务状态创建成功 \\
+    FT-04 & 异步评估 & 后台线程处理 & 上传视频后查询任务状态 & 前端可轮询进度，页面不阻塞 \\
+    FT-05 & 姿态提取 & 关键点识别 & 对测试视频执行 MediaPipe 分析 & 生成关键点、角度和置信度数据 \\
+    FT-06 & 规则评分 & 动作标准匹配 & 选择体式并执行规则评估 & 返回评分、问题关节和偏差说明 \\
+    FT-07 & 多模态反馈 & 建议文本生成 & 将关键帧和规则结果发送给模型 & 返回可阅读的动作改进建议 \\
+    FT-08 & 结果展示 & 评分与建议回显 & 打开评估结果页面 & 正常展示分数、问题和反馈文本 \\
+    FT-09 & 历史记录 & 评估结果留存 & 完成评估后查看历史记录 & 历史报告可查询并重新打开 \\
+    FT-10 & 管理端 & 用户与任务查看 & 管理员登录后台查看用户和任务 & 数据展示正常，权限边界明确 \\
+    FT-11 & 日志记录 & 异常信息追踪 & 构造异常视频或模型失败场景 & 日志记录失败阶段和错误摘要 \\
+    FT-12 & 退出登录 & 会话清理 & 点击退出并重新访问受保护页面 & token 清理，跳转登录或提示未认证 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+功能性需求测试覆盖了用户端和管理端的主要模块。用户端重点验证瑜伽评估主流程，包括用户登录、视频上传、任务创建、状态轮询、姿态识别、规则评分、模型反馈和结果保存等环节；管理端重点验证用户管理、任务记录和异常日志等功能是否能够支撑系统维护。
+
+测试结果表明，系统的用户认证、权限控制和页面访问基本正常，能够区分不同角色的功能范围；视频上传、异步任务、姿态分析和结果展示等核心功能能够完成从视频输入到反馈输出的闭环；历史记录和日志模块能够继续利用评估过程中产生的数据，形成从“动作视频”到“分析结果”再到“复盘追踪”的基本流程。总体来看，功能性需求测试验证了系统核心功能的完整性，并为后续综合分析提供了基础。
+\begin{table}[H]
+  \centering
+  \caption{系统非功能性需求测试用例}
+  \label{tab:non_function_test}
+  \begin{tabular}{p{1.35cm}p{2.0cm}p{2.7cm}p{4.0cm}p{3.0cm}}
+    \toprule
+    测试编号 & 测试类别 & 测试内容 & 测试方法 & 预期结果 \\
+    \midrule
+    NFT-01 & 安全性 & 未登录拦截 & 未登录访问用户端或管理端页面 & 跳转登录页或提示未认证 \\
+    NFT-02 & 安全性 & 权限隔离 & 普通用户访问管理端接口 & 拒绝访问并提示权限不足 \\
+    NFT-03 & 安全性 & 密码保护 & 查看数据库用户密码字段 & 密码哈希存储，无明文信息 \\
+    NFT-04 & 稳定性 & 非法文件处理 & 上传不支持格式或损坏视频 & 返回失败提示，任务状态可追踪 \\
+    NFT-05 & 稳定性 & 姿态识别失败 & 上传无人像或遮挡严重视频 & 返回降级提示，不阻塞主流程 \\
+    NFT-06 & 稳定性 & 模型异常处理 & 模拟模型 API 超时或网络异常 & 启用规则兜底并返回基础结果 \\
+    NFT-07 & 交互性 & 任务轮询体验 & 上传视频后持续查询状态 & 前端逐步显示处理进度 \\
+    NFT-08 & 数据持久化 & 评估结果保存 & 完成评估后刷新页面或重新登录 & 历史记录仍可查询和展示 \\
+    NFT-09 & 可维护性 & 日志追踪 & 构造数据库或模型调用异常 & 日志保留异常阶段和任务编号 \\
+    NFT-10 & 资源适配 & 本地运行 & 启动前后端并测试基础功能 & 本地环境可完成主要演示 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\section{非功能性需求测试}
+非功能性需求测试主要用于验证系统在安全性、稳定性、交互体验、数据持久化和资源适配等方面是否满足运行要求。本文系统涉及前端页面、Flask 后端、SQLite 数据库、视频处理线程、姿态估计算法和外部多模态模型服务，因此测试重点包括权限控制、异常降级处理、轮询体验、数据保存以及本地部署适配等内容。
+
+系统非功能性需求测试用例如表~\ref{tab:non_function_test} 所示。
+
+
+
+非功能性需求测试主要围绕安全性、稳定性、交互性、数据持久化和资源适配展开。安全性测试重点检查 JWT 鉴权、角色权限隔离、未登录访问拦截和密码哈希存储；稳定性测试重点检查视频格式异常、姿态识别失败、模型服务异常和动作标准缺失时，系统是否能够进行降级处理；交互性测试重点检查任务轮询是否能够持续反馈处理状态，减少用户等待过程中的不确定感。
+
+在数据与部署方面，测试重点包括用户信息、视频任务、评估记录和系统日志是否能够正确保存并在重新登录后继续使用；同时检查 Flask 后端、SQLite 数据库、MediaPipe 姿态估计和外部模型接口是否能够在本地开发机环境中配合运行。通过上述测试内容，可以验证系统在权限控制、异常处理、数据保存、异步交互和轻量化部署方面是否满足基本运行要求。
+{\zihao{5}
+\renewcommand{\arraystretch}{0.92}
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{p{2.35cm}p{5.55cm}p{1.45cm}p{3.65cm}}
+  \caption{系统测试结果汇总}
+  \label{tab:test_summary}\\
+  \toprule
+  测试类别 & 测试内容 & 测试结果 & 结果说明 \\
+  \midrule
+  \endfirsthead
+  \caption[]{系统测试结果汇总（续）}\\
+  \toprule
+  测试类别 & 测试内容 & 测试结果 & 结果说明 \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  功能性测试 & 用户登录、视频上传、任务轮询、结果展示、历史记录 & 通过 & 用户端主流程正常 \\
+  管理端测试 & 用户管理、任务查看、异常日志、权限控制 & 通过 & 管理端调用正常 \\
+  姿态分析测试 & 视频解码、关键点提取、关节角度计算、稳定性统计 & 通过 & 可生成结构化特征 \\
+  规则评估测试 & 动作标准匹配、偏差判断、基础评分、降级模板 & 通过 & 评分结果可解释 \\
+  模型反馈测试 & 千问多模态模型调用、反馈文本生成、异常兜底 & 基本通过 & 异常时可规则兜底 \\
+  安全性测试 & JWT 鉴权、角色权限隔离、未登录访问拦截 & 通过 & 权限边界明确 \\
+  数据持久化测试 & 用户信息、视频任务、评估记录和系统日志保存 & 通过 & 数据可再次查询 \\
+  异常处理测试 & 非法视频、无人像视频、未知体式、模型服务异常 & 基本通过 & 可提示或降级输出 \\
+\end{longtable}
+}
+
+\section{测试结果与分析}
+通过对系统功能性需求和非功能性需求进行测试可以看出，本文实现的瑜伽动作评估系统整体能够按照设计要求完成主要业务流程。用户端的注册登录、视频上传、任务轮询、姿态分析、结果展示和历史记录等功能均能够正常使用；管理端的用户查看、任务追踪和异常日志等功能也能够完成相应操作。测试过程中，前端页面能够正常调用后端接口，后端能够完成身份校验、视频处理、数据库写入、模型调用和结果返回，系统核心业务流程基本完整。
+
+系统测试结果汇总如表~\ref{tab:test_summary} 所示。
+
+
+从功能测试结果看，系统已经实现了从“用户上传视频”到“系统生成评估结果”，再到“历史记录保存和结果复盘”的基本闭环。视频上传能够创建后台任务，前端能够通过轮询获取处理状态，后端能够完成视频解码、姿态关键点提取、角度计算和规则评分。结果展示页面能够呈现评分、问题说明和改进建议，说明系统不仅具备单次评估能力，也具备一定的结果留存和追踪能力。
+
+从姿态分析和模型服务测试结果看，系统能够利用 MediaPipe 提取人体关键点，并基于 OpenCV 和 NumPy 完成关节角度与稳定性特征计算。规则评估模块能够根据动作标准库生成基础评分和问题定位，多模态模型则用于把结构化结果转化为更自然的反馈文本。当外部模型调用失败、网络异常或返回内容不稳定时，系统能够退化为本地规则评估结果，保证核心评估流程不中断。
+
+从非功能测试结果看，系统在安全性、稳定性和交互体验方面基本满足设计要求。JWT 鉴权能够区分普通用户和管理员权限，未登录用户无法直接访问受保护功能；异步任务和轮询机制能够降低视频分析过程中的等待不确定感；SQLite 数据库存储能够支持用户信息、视频任务、评估记录和系统日志的持久化。需要注意的是，当前系统仍主要面向本地演示和小规模样本测试，对多人并发、大规模体式库和复杂拍摄环境的覆盖还不充分。
+
+综合来看，系统测试结果表明，本文设计的姿态分析、规则评估与多模态反馈结合方案能够在居家瑜伽动作评估场景中完成基本落地。系统能够通过视频上传、异步处理、关键点提取、规则评分、多模态建议和历史记录支撑完整评估流程，满足毕业设计阶段的功能验证和演示需求。后续系统仍可从多体式覆盖、多角度视频鲁棒性、并发任务调度、模型反馈稳定性和可视化交互等方面继续优化。
+
+\iffalse
 
 \section{测试环境与总体测试策略}
 为了让测试结果尽量接近最终演示和实际使用状态，本文没有把验证工作局限在单一函数级别，而是把多数测试放在接近实际运行环境的本地 Windows 物理机上完成。很多问题只有在真实的视频读写、数据库访问、线程切换和接口调用同时发生时才会暴露出来，因此仅靠局部单元测试并不足以说明整个系统是否可靠。
@@ -1990,6 +2138,7 @@ system\_log & 安全与维保探针。字段包括日志编号、日志级别、
 
 因此，本文可以较为明确地认为：在当前本地环境、当前动作库和当前样本范围内，系统已经达到毕业设计所需的可运行、可演示和可说明水平。它能够把用户上传的视频转化为结构化分析结果，再把分析结果转化为可阅读反馈，并能在异常情况下尽量保留任务状态和排错线索。这一结论虽然不等同于产品成熟，但已经足以支撑本文围绕多模态大模型与姿态分析相结合的工程实践论证。
 
+\fi
 
 % === END INLINE: chapters/02_mainmatter.tex ===
 % === BEGIN INLINE: chapters/03_backmatter.tex ===
